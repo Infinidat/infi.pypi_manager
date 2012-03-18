@@ -61,7 +61,7 @@ def upload_package_to_local_pypi(distribution_format):
     command = ['python', 'setup.py', 'register', '-r', 'local',
                           distribution_format, 'upload', '-r', 'local']
     logger.info("Executing {}".format(' '.join(command)))
-    subprocess = execute()
+    subprocess = execute(command)
     logger.info(subprocess.get_stdout())
     logger.info(subprocess.get_stderr())
     subprocess._assert_success()
