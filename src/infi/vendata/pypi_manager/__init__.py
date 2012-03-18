@@ -64,7 +64,7 @@ def upload_package_to_local_pypi(distribution_format):
     subprocess = execute(command)
     logger.info(subprocess.get_stdout())
     logger.info(subprocess.get_stderr())
-    subprocess._assert_success()
+    assert subprocess.get_returncode() == 0
 
 def upload_sdist_to_local_pypi():
     upload_package_to_local_pypi('sdist')
