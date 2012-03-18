@@ -71,16 +71,19 @@ def upload_sdist_to_local_pypi():
 
 def extract_source_package_to_tempdir(package_source_archive):
     from tempfile import mkdtemp
+    from tarfile import open
+    from zipfile import ZipFile
     import os
     tempdir = mkdtemp()
     logger.info("Unpacking {} to {}".format(package_source_archive, tempdir))
     if package_source_archive.endswith('zip'):
-        from zipfile import ZipFile
         archive = ZipFile(package_source_archive)
         archive.extractall(tempdir)
     elif package_source_archive.endswith('tar.gz'):
-        from tarfile import open
         archive = open(package_source_archive, mode='r:gz')
+        archive.extractall(tempdir)
+    elif package_source_archive.endswith('tar.bz2'):
+        archive = open(package_source_archive, mode='r:bz2')
         archive.extractall(tempdir)
     else:
         raise UnsupportedArchive(package_source_archive)
