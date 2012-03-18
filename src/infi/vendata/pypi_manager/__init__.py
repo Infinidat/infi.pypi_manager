@@ -1,6 +1,9 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
 from infi.pyutils.contexts import contextmanager
+from logging import getLogger
+
+logger = getLogger()
 
 class PackageNotFound(Exception):
     pass
@@ -21,6 +24,7 @@ class PyPI(object):
 
     def get_available_versions(self, package_name):
         releases = self._client.package_releases(package_name)
+        logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
         if len(releases) == 0:
             raise PackageNotFound(package_name)
         return releases
@@ -49,13 +53,18 @@ def download_package_from_global_pypi(package_name):
     fd, path = mkstemp(suffix=url.split('/')[-1])
     write(fd, data)
     close(fd)
+    logger.info("Downloaded {} to {}".format(url, path))
     return path
 
 def upload_package_to_local_pypi(distribution_format):
     from infi.execute import execute
-    subprocess = execute(['python', 'setup.py', 'register', '-r', 'local',
-                          distribution_format, 'upload', '-r', 'local'])
-    subprocess._assert_success
+    command = ['python', 'setup.py', 'register', '-r', 'local',
+                          distribution_format, 'upload', '-r', 'local']
+    logger.info("Executing {}".format(' '.join(command)))
+    subprocess = execute()
+    logger.info(subprocess.get_stdout())
+    logger.info(subprocess.get_stderr())
+    subprocess._assert_success()
 
 def upload_sdist_to_local_pypi():
     upload_package_to_local_pypi('sdist')
@@ -64,6 +73,7 @@ def extract_source_package_to_tempdir(package_source_archive):
     from tempfile import mkdtemp
     import os
     tempdir = mkdtemp()
+    logger.info("Unpacking {} to {}".format(package_source_archive, tempdir))
     if package_source_archive.endswith('zip'):
         from zipfile import ZipFile
         archive = ZipFile(package_source_archive)
