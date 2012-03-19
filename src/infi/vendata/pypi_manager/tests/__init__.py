@@ -24,3 +24,9 @@ class PyPI_TestCase(unittest.TestCase):
         path = download_package_from_global_pypi('infi.traceback')
         size = os.stat(path)[stat.ST_SIZE]
         self.assertGreater(size, 0)
+
+    def test_get_source_url__latest(self):
+        pypi = PyPI()
+        self.assertEqual(pypi.get_latest_source_distribution_url('pycrypto'),
+                         'http://pypi.python.org/packages/source/p/pycrypto/pycrypto-2.5.tar.gz')
+

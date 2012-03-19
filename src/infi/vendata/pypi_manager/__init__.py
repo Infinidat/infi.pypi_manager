@@ -31,7 +31,7 @@ class PyPI(object):
 
     def get_latest_version(self, package_name):
         from pkg_resources import parse_version
-        return self.get_available_versions(package_name)[-1]
+        return self.get_available_versions(package_name)[0]
 
     def get_releases_for_version(self, package_name, release_version):
         return self._client.release_urls(package_name, release_version)
