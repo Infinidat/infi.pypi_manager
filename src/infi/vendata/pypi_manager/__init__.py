@@ -43,12 +43,22 @@ class PyPI(object):
             return release['url']
         raise SourceDistributionNotFound(package_name, release_version)
 
-def download_package_from_global_pypi(package_name):
+    def get_source_distribution_url_of_specific_release_version(self, package_name, release_version):
+        for release in filter(lambda release: release['packagetype'] == 'sdist',
+                              self.get_releases_for_version(package_name, release_version)):
+            return release['url']
+        raise SourceDistributionNotFound(package_name, release_version)
+
+
+def download_package_from_global_pypi(package_name, release_version=None):
     from urllib2 import urlopen
     from tempfile import mkstemp
     from os import write, close
     pypi = PyPI()
-    url = pypi.get_latest_source_distribution_url(package_name)
+    if release_version is None:
+        url = pypi.get_latest_source_distribution_url(package_name)
+    else:
+        url = pypi.get_source_distribution_url_of_specific_release_version(package_name, release_version)
     data = urlopen(url).read()
     fd, path = mkstemp(suffix=url.split('/')[-1])
     write(fd, data)
