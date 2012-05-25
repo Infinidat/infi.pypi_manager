@@ -28,5 +28,5 @@ class PyPI_TestCase(unittest.TestCase):
     def test_get_source_url__latest(self):
         pypi = PyPI()
         self.assertEqual(pypi.get_latest_source_distribution_url('pycrypto'),
-                         'http://pypi.python.org/packages/source/p/pycrypto/pycrypto-2.5.tar.gz')
+                         'http://pypi.python.org/packages/source/p/pycrypto/pycrypto-2.6.tar.gz')
 
