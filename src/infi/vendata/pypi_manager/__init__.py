@@ -31,7 +31,7 @@ class Chishop(object):
             raise PackageNotFound(package_name)
         root = ElementTree.fromstring(doap)
         items = []
-        package_types = dict(exe='bdist_wininst', egg='bdist_egg', gz='sdist', zip='sdist')
+        package_types = dict(exe='bdist_wininst', egg='bdist_egg', gz='sdist', zip='sdist', bz2='sdist')
         for version_element in root.iter('{http://usefulinc.com/ns/doap#}Version'):
             # release --> Version --> file-release|revision
             for filename_element in version_element.iter('{http://usefulinc.com/ns/doap#}file-release'):
