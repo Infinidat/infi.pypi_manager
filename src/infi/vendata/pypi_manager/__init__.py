@@ -19,9 +19,9 @@ class InvalidArchive(Exception):
 
 class PyPI(object):
     def __init__(self, pypi_address="pypi.python.org"):
+        super(PyPI, self).__init__()
         import xmlrpclib
-        self._client = xmlrpclib.ServerProxy("http://{}/pypi".format(pypi_address)
-        self._simple_interface_url = "http://{}/simple".format(pypi_address)
+        self._client = xmlrpclib.ServerProxy("http://{}/pypi".format(pypi_address))
 
     def get_available_versions(self, package_name):
         releases = self._client.package_releases(package_name)
@@ -31,7 +31,6 @@ class PyPI(object):
         return releases
 
     def get_latest_version(self, package_name):
-        from pkg_resources import parse_version
         return self.get_available_versions(package_name)[0]
 
     def get_releases_for_version(self, package_name, release_version):
@@ -39,17 +38,13 @@ class PyPI(object):
 
     def get_latest_source_distribution_url(self, package_name):
         release_version = self.get_latest_version(package_name)
-        for release in filter(lambda release: release['packagetype'] == 'sdist',
-                              self.get_releases_for_version(package_name, release_version)):
-            return release['url']
-        raise SourceDistributionNotFound(package_name, release_version)
+        return self.get_source_distribution_url_of_specific_release_version(package_name, release_version)
 
     def get_source_distribution_url_of_specific_release_version(self, package_name, release_version):
         for release in filter(lambda release: release['packagetype'] == 'sdist',
                               self.get_releases_for_version(package_name, release_version)):
             return release['url']
         raise SourceDistributionNotFound(package_name, release_version)
-
 
 def download_package_from_global_pypi(package_name, release_version=None):
     from urllib2 import urlopen
