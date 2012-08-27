@@ -18,9 +18,10 @@ class InvalidArchive(Exception):
     pass
 
 class PyPI(object):
-    def __init__(self):
+    def __init__(self, pypi_address="pypi.python.org"):
         import xmlrpclib
-        self._client = xmlrpclib.ServerProxy('http://pypi.python.org/pypi')
+        self._client = xmlrpclib.ServerProxy("http://{}/pypi".format(pypi_address)
+        self._simple_interface_url = "http://{}/simple".format(pypi_address)
 
     def get_available_versions(self, package_name):
         releases = self._client.package_releases(package_name)
