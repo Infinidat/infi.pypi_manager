@@ -17,9 +17,9 @@ class UnsupportedArchive(Exception):
 class InvalidArchive(Exception):
     pass
 
-class Chishop(object):
+class DjangoPyPI(object):
     def __init__(self, server):
-        super(Chishop, self).__init__()
+        super(DjangoPyPI, self).__init__()
         self.server = 'http://{}'.format(server.replace("http://", ""))
 
     def get_info_from_doap(self, package_name):
