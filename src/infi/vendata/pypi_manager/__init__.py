@@ -18,7 +18,7 @@ class InvalidArchive(Exception):
     pass
 
 class Chishop(object):
-    def __init__(self, server="pypi01.infinidat.com"):
+    def __init__(self, server):
         super(Chishop, self).__init__()
         self.server = 'http://{}'.format(server.replace("http://", ""))
 

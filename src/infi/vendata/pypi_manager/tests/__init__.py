@@ -32,16 +32,16 @@ class PyPI_TestCase(unittest.TestCase):
 
 class Chishop_TestCase(unittest.TestCase):
     def test_get_package__exists(self):
-        pypi = Chishop()
+        pypi = Chishop("pypi01.infinidat.com")
         result = pypi.get_available_versions('infi.traceback')
 
     def test_get_package__doesn_not_exist(self):
-        pypi = Chishop()
+        pypi = Chishop("pypi01.infinidat.com")
         with self.assertRaises(PackageNotFound):
             pypi.get_available_versions('abcxyz')
 
     def test_get_source_url(self):
-        pypi = Chishop()
+        pypi = Chishop("pypi01.infinidat.com")
         self.assertEqual(pypi.get_latest_source_distribution_url('ipython'),
                          'http://pypi01.infinidat.com//media/dists/ipython-0.13.tar.gz#md5=42832d994731e9f64d0944ae864be4a1')
 
@@ -54,8 +54,7 @@ class Chishop_TestCase(unittest.TestCase):
         self.assertGreater(size, 0)
 
     def test_get_source_url__latest(self):
-        pypi = Chishop()
+        pypi = Chishop("pypi01.infinidat.com")
         self.assertEqual(pypi.get_latest_source_distribution_url('pycrypto'),
                          'http://pypi01.infinidat.com//media/dists/pycrypto-2.5.tar.gz#md5=2fdd4d7919840b5fbc800b8364cb8ca4')
-
 
