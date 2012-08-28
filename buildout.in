@@ -1,9 +1,9 @@
 [buildout]
-include-site-packages = false
+include-site-packages = true
 install-from-cache = true
 relative-paths = false
 unzip = true
-newest = false
+newest = true
 download-cache = .cache
 develop = .
 parts = production-scripts

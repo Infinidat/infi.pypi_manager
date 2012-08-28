@@ -44,4 +44,4 @@ parts/*.wixpdb
 parts/*.msi
 
 
-src/infi/vendata/pypi_manager/__version__.py
+src/infi/pypi_manager/__version__.py

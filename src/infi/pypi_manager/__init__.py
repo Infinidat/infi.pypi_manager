@@ -17,9 +17,9 @@ class UnsupportedArchive(Exception):
 class InvalidArchive(Exception):
     pass
 
-class Chishop(object):
-    def __init__(self, server="pypi01.infinidat.com"):
-        super(Chishop, self).__init__()
+class DjangoPyPI(object):
+    def __init__(self, server):
+        super(DjangoPyPI, self).__init__()
         self.server = 'http://{}'.format(server.replace("http://", ""))
 
     def get_info_from_doap(self, package_name):
@@ -31,7 +31,7 @@ class Chishop(object):
             raise PackageNotFound(package_name)
         root = ElementTree.fromstring(doap)
         items = []
-        package_types = dict(exe='bdist_wininst', egg='bdist_egg', gz='sdist', zip='sdist')
+        package_types = dict(exe='bdist_wininst', egg='bdist_egg', gz='sdist', zip='sdist', bz2='sdist')
         for version_element in root.iter('{http://usefulinc.com/ns/doap#}Version'):
             # release --> Version --> file-release|revision
             for filename_element in version_element.iter('{http://usefulinc.com/ns/doap#}file-release'):
