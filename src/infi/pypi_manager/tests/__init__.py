@@ -15,7 +15,7 @@ class PyPI_TestCase(unittest.TestCase):
     def test_get_source_url(self):
         pypi = PyPI()
         self.assertEqual(pypi.get_latest_source_distribution_url('ipython'),
-                         'http://pypi.python.org/packages/source/i/ipython/ipython-0.13.tar.gz')
+                         'http://pypi.python.org/packages/source/i/ipython/ipython-0.13.1.tar.gz')
 
     def test_download(self):
         from .. import download_package_from_global_pypi
