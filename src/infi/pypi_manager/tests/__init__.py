@@ -27,8 +27,8 @@ class PyPI_TestCase(unittest.TestCase):
 
     def test_get_source_url__latest(self):
         pypi = PyPI()
-        self.assertEqual(pypi.get_latest_source_distribution_url('pycrypto'),
-                         'http://pypi.python.org/packages/source/p/pycrypto/pycrypto-2.6.tar.gz')
+        self.assertEqual(pypi.get_latest_source_distribution_url('infi'),
+                         'http://pypi.python.org/packages/source/i/infi/infi-0.0.1-develop-1.tar.gz')
 
 class DjangoPyPI_TestCase(unittest.TestCase):
     def test_get_package__exists(self):
@@ -55,6 +55,5 @@ class DjangoPyPI_TestCase(unittest.TestCase):
 
     def test_get_source_url__latest(self):
         pypi = DjangoPyPI("pypi01.infinidat.com")
-        self.assertEqual(pypi.get_latest_source_distribution_url('pycrypto'),
-                         'http://pypi01.infinidat.com//media/dists/pycrypto-2.5.tar.gz#md5=2fdd4d7919840b5fbc800b8364cb8ca4')
-
+        self.assertEqual(pypi.get_latest_source_distribution_url('infi'),
+                         'http://pypi01.infinidat.com//media/dists/infi-0.0.1-develop-1.tar.gz#md5=97cfb0266e37c3115d031f77f420f463')
