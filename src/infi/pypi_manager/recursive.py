@@ -2,6 +2,7 @@ from logging import getLogger
 from infi.pyutils.contexts import contextmanager
 logger = getLogger(__name__)
 
+
 class Env(object):
     def __init__(self, basedir):
         from os import path
@@ -40,18 +41,9 @@ class Env(object):
 
 
 @contextmanager
-def tempdir():
-    from tempfile import mkdtemp
-    from shutil import rmtree
-    path = mkdtemp()
-    try:
-        yield path
-    finally:
-        rmtree(path)
-
-@contextmanager
 def virtualenv():
     from infi.execute import execute_assert_success
+    from . import tempdir
     with tempdir() as path:
         logger.info("Creating virtualenv in {0}".format(path))
         execute_assert_success(["virtualenv", "--no-site-packages", "--distribute", path])
