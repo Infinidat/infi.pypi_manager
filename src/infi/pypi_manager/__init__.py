@@ -5,17 +5,22 @@ from logging import getLogger
 
 logger = getLogger()
 
+
 class PackageNotFound(Exception):
     pass
+
 
 class SourceDistributionNotFound(Exception):
     pass
 
+
 class UnsupportedArchive(Exception):
     pass
 
+
 class InvalidArchive(Exception):
     pass
+
 
 class DjangoPyPI(object):
     def __init__(self, server):
@@ -37,7 +42,7 @@ class DjangoPyPI(object):
             for filename_element in version_element.iter('{http://usefulinc.com/ns/doap#}file-release'):
                 uri = filename_element.get('{http://www.w3.org/1999/02/22-rdf-syntax-ns#}resource')
                 url = "{}/{}".format(self.server, uri)
-                item = dict(has_sig=True, md5_sigest=url.split('=',1)[1], url=url, filename=filename_element.text,
+                item = dict(has_sig=True, md5_sigest=url.split('=', 1)[1], url=url, filename=filename_element.text,
                             version=version_element.find('{http://usefulinc.com/ns/doap#}revision').text)
                 item['packagetype'] = package_types.get(item['filename'].split('.')[-1], 'unknown')
                 items.append(item)
@@ -101,6 +106,7 @@ class PyPI(object):
             return release['url']
         raise SourceDistributionNotFound(package_name, release_version)
 
+
 def download_package_from_global_pypi(package_name, release_version=None):
     from urllib2 import urlopen
     from tempfile import mkstemp
@@ -117,43 +123,41 @@ def download_package_from_global_pypi(package_name, release_version=None):
     logger.info("Downloaded {} to {}".format(url, path))
     return path
 
-def upload_package_to_local_pypi(distribution_format):
+
+def upload_package_to_local_pypi(distribution_format, index_server):
     from infi.execute import execute
-    command = ['python', 'setup.py', 'register', '-r', 'local',
-                          distribution_format, 'upload', '-r', 'local']
+    command = ['python', 'setup.py', 'register', '-r', index_server,
+                          distribution_format, 'upload', '-r', index_server]
     logger.info("Executing {}".format(' '.join(command)))
     subprocess = execute(command)
     logger.info(subprocess.get_stdout())
     logger.info(subprocess.get_stderr())
     assert subprocess.get_returncode() == 0
 
-def upload_sdist_to_local_pypi():
-    upload_package_to_local_pypi('sdist')
 
-def extract_source_package_to_tempdir(package_source_archive):
-    from tempfile import mkdtemp
-    from tarfile import open
+def extract_source_package_to_tempdir(package_source_archive, dest_dir):
+    import tarfile
     from zipfile import ZipFile
     import os
-    tempdir = mkdtemp()
-    logger.info("Unpacking {} to {}".format(package_source_archive, tempdir))
+    logger.info("Unpacking {} to {}".format(package_source_archive, dest_dir))
     if package_source_archive.endswith('zip'):
         archive = ZipFile(package_source_archive)
-        archive.extractall(tempdir)
+        archive.extractall(dest_dir)
     elif package_source_archive.endswith('tar.gz'):
-        archive = open(package_source_archive, mode='r:gz')
-        archive.extractall(tempdir)
+        archive = tarfile.open(package_source_archive, mode='r:gz')
+        archive.extractall(dest_dir)
     elif package_source_archive.endswith('tar.bz2'):
-        archive = open(package_source_archive, mode='r:bz2')
-        archive.extractall(tempdir)
+        archive = tarfile.open(package_source_archive, mode='r:bz2')
+        archive.extractall(dest_dir)
     else:
         raise UnsupportedArchive(package_source_archive)
-    if os.path.exists(os.path.join(tempdir, 'setup.py')):
-        return tempdir
-    for dirname in os.listdir(tempdir):
-        if os.path.exists(os.path.join(tempdir, dirname, 'setup.py')):
-            return os.path.join(tempdir, dirname)
-    raise InvalidArchive(package_source_archive, tempdir)
+    if os.path.exists(os.path.join(dest_dir, 'setup.py')):
+        return dest_dir
+    for dirname in os.listdir(dest_dir):
+        if os.path.exists(os.path.join(dest_dir, dirname, 'setup.py')):
+            return os.path.join(dest_dir, dirname)
+    raise InvalidArchive(package_source_archive, dest_dir)
+
 
 @contextmanager
 def chdir(path):
@@ -164,3 +168,14 @@ def chdir(path):
         yield
     finally:
         os.chdir(curdir)
+
+
+@contextmanager
+def tempdir():
+    from tempfile import mkdtemp
+    from shutil import rmtree
+    path = mkdtemp()
+    try:
+        yield path
+    finally:
+        rmtree(path)
