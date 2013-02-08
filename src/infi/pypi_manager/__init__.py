@@ -156,6 +156,7 @@ def extract_source_package_to_tempdir(package_source_archive, dest_dir):
     for dirname in os.listdir(dest_dir):
         if os.path.exists(os.path.join(dest_dir, dirname, 'setup.py')):
             return os.path.join(dest_dir, dirname)
+        raise InvalidArchive(package_source_archive, dest_dir)
     raise InvalidArchive(package_source_archive, dest_dir)
 
 
