@@ -2,16 +2,16 @@
 Pull packages from pypi.python.org and push them to your local DjangoPyPI server
 
 Usage:
-    mirror_package <package_name> [<distribution_type>] [<release_version>] [--recursive] [--local-index=<local-index>]
+    mirror_package <package_name> [<distribution_type>] [<release_version>] [--recursive] [--index-server=<index-server>]
 
 Options:
-    <package_name>                  package to pull and push
-    <distribution_type>             distribution type to push to your pypi server [default: sdist]
-    <release_version>               optional specific version to pull, else the latests on pypi.python.org
-    --local-index=<local-index>     local index server from ~/.pypirc to push the package to [default: local]
-    --recursive                     recursively mirror all the dependencies
-    --help                          show this screen
-    --version                       show version
+    <package_name>                    package to pull and push
+    <distribution_type>               distribution type to push to your pypi server [default: sdist]
+    <release_version>                 optional specific version to pull, else the latests on pypi.python.org
+    --index-server=<index-server>     local index server from ~/.pypirc to push the package to [default: local]
+    --recursive                       recursively mirror all the dependencies
+    --help                            show this screen
+    --version                         show version
 """
 
 import sys
