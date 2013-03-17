@@ -22,10 +22,15 @@ class InvalidArchive(Exception):
     pass
 
 
-class DjangoPyPI(object):
+class PyPIBase(object):
     def __init__(self, server):
-        super(DjangoPyPI, self).__init__()
-        self.server = 'http://{}'.format(server.replace("http://", ""))
+        if not server.startswith("http://"):
+            server = "http://" + server
+        self.server = server
+
+class DjangoPyPI(PyPIBase):
+    def __init__(self, server):
+        super(DjangoPyPI, self).__init__(server)
 
     def get_info_from_doap(self, package_name):
         """:returns a list of dictionaries of: has_sig, md5_digest, packagetype, url, version, filename"""
@@ -76,11 +81,11 @@ class DjangoPyPI(object):
         raise SourceDistributionNotFound(package_name, release_version)
 
 
-class PyPI(object):
-    def __init__(self, pypi_address="pypi.python.org"):
-        super(PyPI, self).__init__()
+class PyPI(PyPIBase):
+    def __init__(self, server="http://pypi.python.org"):
+        super(PyPI, self).__init__(server)
         import xmlrpclib
-        self._client = xmlrpclib.ServerProxy("http://{}/pypi".format(pypi_address))
+        self._client = xmlrpclib.ServerProxy("{}/pypi".format(self.server))
 
     def get_available_versions(self, package_name):
         releases = self._client.package_releases(package_name)
