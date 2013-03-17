@@ -27,6 +27,13 @@ class PyPIBase(object):
         if not server.startswith("http://"):
             server = "http://" + server
         self.server = server
+        
+    def get_all_packages(self):
+        from urllib import urlopen
+        import re
+        simple_html = urlopen(self.server + "/simple").read()
+        return re.findall("""href=["'](?:/simple/)?(.*?)/["']""", simple_html)
+
 
 class DjangoPyPI(PyPIBase):
     def __init__(self, server):
