@@ -22,10 +22,22 @@ class InvalidArchive(Exception):
     pass
 
 
-class DjangoPyPI(object):
+class PyPIBase(object):
     def __init__(self, server):
-        super(DjangoPyPI, self).__init__()
-        self.server = 'http://{}'.format(server.replace("http://", ""))
+        if not server.startswith("http://"):
+            server = "http://" + server
+        self.server = server
+        
+    def get_all_packages(self):
+        from urllib import urlopen
+        import re
+        simple_html = urlopen(self.server + "/simple").read()
+        return re.findall("""href=["'](?:/simple/)?(.*?)/["']""", simple_html)
+
+
+class DjangoPyPI(PyPIBase):
+    def __init__(self, server):
+        super(DjangoPyPI, self).__init__(server)
 
     def get_info_from_doap(self, package_name):
         """:returns a list of dictionaries of: has_sig, md5_digest, packagetype, url, version, filename"""
@@ -57,10 +69,9 @@ class DjangoPyPI(object):
 
     def get_latest_version(self, package_name):
         from pkg_resources import parse_version
-        parsed_versions = {parse_version(version):version for version in self.get_available_versions(package_name)}
-        keys = parsed_versions.keys()
-        keys.sort()
-        return parsed_versions[keys[-1]]
+        versions = self.get_available_versions(package_name)
+        versions.sort(key=lambda version: parse_version(version))
+        return versions[-1]
 
     def get_releases_for_version(self, package_name, release_version):
         return [item for item in self.get_info_from_doap(package_name)
@@ -77,11 +88,11 @@ class DjangoPyPI(object):
         raise SourceDistributionNotFound(package_name, release_version)
 
 
-class PyPI(object):
-    def __init__(self, pypi_address="pypi.python.org"):
-        super(PyPI, self).__init__()
+class PyPI(PyPIBase):
+    def __init__(self, server="http://pypi.python.org"):
+        super(PyPI, self).__init__(server)
         import xmlrpclib
-        self._client = xmlrpclib.ServerProxy("http://{}/pypi".format(pypi_address))
+        self._client = xmlrpclib.ServerProxy("{}/pypi".format(self.server))
 
     def get_available_versions(self, package_name):
         releases = self._client.package_releases(package_name)
