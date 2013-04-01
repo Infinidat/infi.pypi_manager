@@ -31,19 +31,13 @@ def _logging():
 
 
 def _mirror_package(arguments):
-    from .. import download_package_from_global_pypi
-    from .. import upload_package_to_local_pypi
-    from .. import extract_source_package_to_tempdir, chdir, tempdir
+    from ..mirror import mirror_package
     index_server = arguments.get("--index-server")
     package_name = arguments.get("<package_name>")
     distribution_type = arguments.get("<distribution_type>")
     release_version = arguments.get("<release_version>")
     recursive = arguments.get("--recursive")
-    package_source_archive = download_package_from_global_pypi(package_name, release_version)
-    with tempdir() as base:
-        setup_py_dir = extract_source_package_to_tempdir(package_source_archive, base)
-        with chdir(setup_py_dir):
-            upload_package_to_local_pypi(distribution_type, index_server)
+    mirror_package(package_name, distribution_type, release_version, index_server)
     if recursive:
         _recursive(package_name, distribution_type, release_version)
 
