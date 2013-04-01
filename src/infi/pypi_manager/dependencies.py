@@ -1,18 +1,24 @@
 def get_dependencies(name):
-    from pkg_resources import get_distribution
     from collections import deque
+    from pkg_resources import get_distribution
     distribution = get_distribution(name)
     queue = deque()
-    queue.extend(distribution.requires())
-    dependencies = set()
+    returned_dependencies = set()
+    queue.append(distribution)
     while queue:
-        depenency = queue.popleft().project_name
-        if depenency in dependencies:
+        dependency = queue.popleft()
+        dependency_name = dependency.project_name
+        # get the requirement with the specs, if any
+        dependency_str = str(dependency).split(' ')[0]
+        if dependency_name in returned_dependencies:
             continue
-        dependencies.add(depenency)
-        queue.extend(get_distribution(depenency).requires())
-    return dependencies
+        yield dependency_name, dependency_str
+        returned_dependencies.add(dependency_name)
+        queue.extend(get_distribution(dependency_name).requires())
 
 if __name__ == "__main__":
     import sys
-    print repr(get_dependencies(sys.argv[-1]))
+    dependencies = get_dependencies(sys.argv[-1])
+    dependencies = [dependency_name for dependency_name, dependency_str in dependencies]
+    dependencies = dependencies[1:]     # skip self
+    print repr(dependencies)

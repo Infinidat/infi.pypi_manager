@@ -1,23 +1,7 @@
 import re
 from infi.execute import execute_assert_success
 from pkg_resources import get_distribution
-
-def get_dependencies(name):
-    from collections import deque
-    distribution = get_distribution(name)
-    queue = deque()
-    returned_dependencies = []
-    queue.append(distribution)
-    while queue:
-        dependency = queue.popleft()
-        dependency_name = dependency.project_name
-        # get the requirement with the specs, if any
-        dependency_str = str(dependency).split(' ')[0]
-        if dependency_name in returned_dependencies:
-            continue
-        yield dependency_name, dependency_str
-        returned_dependencies.append(dependency_name)
-        queue.extend(get_distribution(dependency_name).requires())
+from ..dependencies import get_dependencies
 
 def run_easy_install(package_name, package):
     cmd = "easy_install -U '{}'".format(package)
