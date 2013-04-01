@@ -44,12 +44,15 @@ def _mirror_package(arguments):
         from ..mirror_all import mirror_package
         mirror_package(index_server, package_name, release_version)
     if recursive:
-        _recursive(package_name, distribution_type, release_version)
+        _recursive(package_name, release_version, arguments)
 
 
-def _recursive(package_name, distribution_type, release_version):
+def _recursive(package_name, release_version, arguments):
     from ..recursive import virtualenv
     with virtualenv() as env:
         env.easy_install(package_name, release_version)
         for dependency in env.get_dependencies(package_name):
-            mirror_package([dependency, distribution_type, env.get_installed_version(dependency)])
+            arguments['<package_name>'] = dependency
+            arguments['<release_version>'] = env.get_installed_version(dependency)
+            arguments['--recursive'] = None
+            _mirror_package(arguments)
