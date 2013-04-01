@@ -21,6 +21,9 @@ def mirror_package(argv=sys.argv[1:]):
     from docopt import docopt
     from ..__version__ import __version__
     arguments = dict(docopt(__doc__, argv=argv, help=True, version=__version__))
+    # docopt doesn't parse 'default' for positional arguments
+    if arguments["<distribution_type>"] is None:
+        arguments["<distribution_type>"] = "sdist"
     _logging()
     _mirror_package(arguments)
 
