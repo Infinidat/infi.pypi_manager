@@ -43,7 +43,7 @@ class Env(object):
 @contextmanager
 def virtualenv():
     from infi.execute import execute_assert_success
-    from .mirror import tempdir
+    from .mirror_build import tempdir
     with tempdir() as path:
         logger.info("Creating virtualenv in {0}".format(path))
         execute_assert_success(["virtualenv", "--no-site-packages", "--distribute", path])

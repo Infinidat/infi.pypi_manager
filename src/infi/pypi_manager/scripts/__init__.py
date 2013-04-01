@@ -2,12 +2,12 @@
 Pull packages from pypi.python.org and push them to your local DjangoPyPI server
 
 Usage:
-    mirror_package <package_name> [<distribution_type>] [<release_version>] [--recursive] [--index-server=<index-server>]
+    mirror_package <package_name> [<release_version>] [--build=<distribution-type>] [--recursive] [--index-server=<index-server>]
 
 Options:
     <package_name>                    package to pull and push
-    <distribution_type>               distribution type to push to your pypi server [default: sdist]
     <release_version>                 optional specific version to pull, else the latests on pypi.python.org
+    --build=<distribution-type>       manually download and build specific distribution of package
     --index-server=<index-server>     local index server from ~/.pypirc to push the package to [default: local]
     --recursive                       recursively mirror all the dependencies
     --help                            show this screen
@@ -21,9 +21,6 @@ def mirror_package(argv=sys.argv[1:]):
     from docopt import docopt
     from ..__version__ import __version__
     arguments = dict(docopt(__doc__, argv=argv, help=True, version=__version__))
-    # docopt doesn't parse 'default' for positional arguments
-    if arguments["<distribution_type>"] is None:
-        arguments["<distribution_type>"] = "sdist"
     _logging()
     _mirror_package(arguments)
 
@@ -34,13 +31,18 @@ def _logging():
 
 
 def _mirror_package(arguments):
-    from ..mirror import mirror_package
     index_server = arguments.get("--index-server")
     package_name = arguments.get("<package_name>")
     distribution_type = arguments.get("<distribution_type>")
     release_version = arguments.get("<release_version>")
+    distribution_type = arguments.get("--build")
     recursive = arguments.get("--recursive")
-    mirror_package(package_name, distribution_type, release_version, index_server)
+    if distribution_type is not None:
+        from ..mirror_build import mirror_package
+        mirror_package(package_name, distribution_type, release_version, index_server)
+    else:
+        from ..mirror_all import mirror_package
+        mirror_package(index_server, package_name, release_version)
     if recursive:
         _recursive(package_name, distribution_type, release_version)
 
