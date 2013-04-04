@@ -1,6 +1,7 @@
 import unittest
 
-from .. import PyPI, PackageNotFound, download_package_from_global_pypi, DjangoPyPI
+from .. import PyPI, PackageNotFound
+from ..mirror_build import download_package_from_global_pypi, DjangoPyPI
 
 class PyPI_TestCase(unittest.TestCase):
     def test_get_package__exists(self):
@@ -18,7 +19,6 @@ class PyPI_TestCase(unittest.TestCase):
                          'http://pypi.python.org/packages/source/i/ipython/ipython-0.13.1.tar.gz')
 
     def test_download(self):
-        from .. import download_package_from_global_pypi
         import stat
         import os
         path = download_package_from_global_pypi('infi.traceback')
@@ -46,7 +46,6 @@ class DjangoPyPI_TestCase(unittest.TestCase):
                          'http://pypi01.infinidat.com//media/dists/ipython-0.13.1.tar.gz#md5=ca7e75f7c802afc6aaa0a1ea59846420')
 
     def test_download(self):
-        from .. import download_package_from_global_pypi
         import stat
         import os
         path = download_package_from_global_pypi('infi.traceback')
