@@ -28,7 +28,7 @@ class PyPI_TestCase(unittest.TestCase):
     def test_get_source_url__latest(self):
         pypi = PyPI()
         self.assertEqual(pypi.get_latest_source_distribution_url('infi'),
-                         'http://pypi.python.org/packages/source/i/infi/infi-0.0.1-develop-1.tar.gz')
+                         'http://pypi.python.org/packages/source/i/infi/infi-0.0.1.tar.gz')
 
 class DjangoPyPI_TestCase(unittest.TestCase):
     def test_get_package__exists(self):
