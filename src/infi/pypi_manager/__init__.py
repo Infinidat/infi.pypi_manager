@@ -27,7 +27,7 @@ class PyPIBase(object):
         if not server.startswith("http://"):
             server = "http://" + server
         self.server = server
-        
+
     def get_all_packages(self):
         from urllib import urlopen
         import re
@@ -116,3 +116,9 @@ class PyPI(PyPIBase):
                               self.get_releases_for_version(package_name, release_version)):
             return release['url']
         raise SourceDistributionNotFound(package_name, release_version)
+
+    def get_release_data(self, package_name, version=None):
+        if version is None:
+            version = self.get_latest_version(package_name)
+        return self._client.release_data(package_name, version)
+
