@@ -19,7 +19,7 @@ logger = getLogger()
 def send_setuptools_request(repository, username, password, data):
     # code taken from distribute 0.6.35, file ./setuptools/command/upload.py
     # changed logging and return value
-    
+
     # set up the authentication
     auth = "Basic " + base64.encodestring(username + ":" + password).strip()
 
@@ -106,11 +106,11 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
     }
 
     data.update(metadata)
-    
+
     for key, value in data.items():
         if isinstance(value, unicode):
             data[key] = value.encode("utf-8")
-    
+
     repository = repository_config["repository"]
     username = repository_config.get("username", "")
     password = repository_config.get("password", "")
@@ -137,7 +137,7 @@ def mirror_release(repository_config, package_name, version, version_data, relea
     }
     for key in ['license', 'author', 'author_email', 'home_page', 'platform', 'summary', 'classifiers', 'description']:
         metadata[key] = version_data[key]
-    
+
     with temp_urlretrieve(release_data['url'], release_data['filename']):
         return mirror_file(repository_config, release_data['filename'], package_name, version, metadata)
 
@@ -152,15 +152,13 @@ def get_repository_config(server_name):
 
 def mirror_package(server_name, package_name, version=None):
     pypi = PyPI()
-    if version is None:
-        version = pypi.get_latest_version(package_name)
-    version_data = pypi._client.release_data(package_name, version)
+    release_data = pypi.get_release_data(package_name, version)
     release_dataset = pypi._client.release_urls(package_name, version)
     repository_config = get_repository_config(server_name)
     final_result = True
-    
+
     for release_data in release_dataset:
         result = mirror_release(repository_config, package_name, version, version_data, release_data)
         final_result = final_result and result
-        
+
     return final_result

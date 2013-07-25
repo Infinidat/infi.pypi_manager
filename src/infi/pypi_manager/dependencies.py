@@ -16,9 +16,12 @@ def get_dependencies(name):
         returned_dependencies.add(dependency_name)
         queue.extend(get_distribution(dependency_name).requires())
 
-if __name__ == "__main__":
+def main():
     import sys
     dependencies = get_dependencies(sys.argv[-1])
     dependencies = [dependency_name for dependency_name, dependency_str in dependencies]
-    dependencies = dependencies[1:]     # skip self
-    print repr(dependencies)
+    dependencies = sorted(dependencies[1:])     # skip self
+    print('\n'.join(dependencies))
+
+if __name__ == "__main__":
+    main()
