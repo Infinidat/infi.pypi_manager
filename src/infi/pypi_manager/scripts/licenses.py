@@ -15,30 +15,47 @@ def _dependency_string_to_name_and_version(s):
         return s, None
     return match.group('name'), match.group('version')
 
-License = namedtuple('License', ('name', 'version', 'license', 'notice'))
-LICENSE_FIELDS = License._fields
+class License(object):
+    FIELDS = ('name', 'version', 'license', 'notice', 'homepage', 'package_url')
+    def __init__(self, **kwargs):
+        for key in self.FIELDS:
+            if key not in kwargs:
+                setattr(self, key, None)
+        for key, value in kwargs.iteritems():
+            if key not in self.FIELDS:
+                raise TypeError('Unexpected argument for {}: {}'.format(type(self).__name__, key))
+            setattr(self, key, value)
+    def __getitem__(self, item):
+        if item not in self.FIELDS:
+            raise KeyError('{} has no such field: {}'.format(type(self).__name__, item))
+        return getattr(self, item)
 
 def get_license(package_name, version=None, safe=False):
+    license = License(
+            name=package_name,
+            version=version,
+            )
     pypi_client = PyPI()
     try:
         info = pypi_client.get_release_data(package_name, version=version)
     except PackageNotFound:
         if safe:
-            return License(package_name, version, None, None)
+            return license
         raise
     if not info:
-        return License(package_name, version, None, None)
-    version = info.get('version', version)
-    license, notice = None, None
+        return license
+    license.version = info.get('version', version)
     if 'classifiers' in info:
         classifiers = [c.split(' :: ') for c in info['classifiers']]
         license_classifiers = [c for c in classifiers if c[0] == 'License']
         if license_classifiers:
-            license = ', '.join(set(c[-1] for c in license_classifiers))
+            license.license = ', '.join(set(c[-1] for c in license_classifiers))
     if 'license' in info:
-        notice = info['license']
-        license = license or notice
-    return License(package_name, version, license, notice)
+        license.notice = info['license']
+        license.license = license.license or license.notice
+    license.homepage = info.get('home_page')
+    license.package_url = info.get('release_url')
+    return license
 
 def get_dependency_licenses(package_name, progress_callback=None):
     ''' Return licenses of package dependencies '''
@@ -80,9 +97,9 @@ def output_csv(package_name, licenses):
     filename = os.path.abspath('{}-dependencies.csv'.format(package_name))
     with open(filename, 'w') as f:
         writer = csv.writer(f)
-        writer.writerow(LICENSE_FIELDS)
+        writer.writerow([f.replace('_', ' ').title() for f in License.FIELDS])
         for license in licenses:
-            writer.writerow(license)
+            writer.writerow([getattr(license, f) for f in License.FIELDS])
     print('Saved licenses in {}'.format(filename), file=sys.stderr)
 
 def main():
