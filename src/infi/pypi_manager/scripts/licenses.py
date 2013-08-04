@@ -80,11 +80,14 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument('name', help='Package name')
     parser.add_argument('--csv', action='store_true', help='Output in CSV format')
+    parser.add_argument('--table', action='store_true', help='Output as a table')
     args = parser.parse_args()
     licenses = get_dependency_licenses(args.name, progress_callback=_progress_callback)
     iterator = sorted(licenses, key=lambda license: license.name.lower())
     if args.csv:
         output_csv(args.name, iterator)
+    elif args.table:
+        output_table(iterator)
     else:
         output_normal(iterator)
 
@@ -101,6 +104,21 @@ def output_csv(package_name, licenses):
         for license in licenses:
             writer.writerow([getattr(license, f) for f in License.FIELDS])
     print('Saved licenses in {}'.format(filename), file=sys.stderr)
+
+def output_table(licenses):
+    from prettytable import PrettyTable
+    excluded_fields = ('notice',)
+    fields = [f for f in License.FIELDS if f not in excluded_fields]
+    t = PrettyTable([f.replace('_', ' ').title() for f in fields])
+    t.align = 'l'
+    def getfield(_l, _f):
+        _v = getattr(_l, _f)
+        if _v is None:
+            return ''
+        return _v
+    for license in licenses:
+        t.add_row([getfield(license, f) for f in fields])
+    print(t.get_string())
 
 def main():
     try:
