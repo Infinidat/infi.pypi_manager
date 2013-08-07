@@ -1,7 +1,9 @@
 from __future__ import print_function
+import os
 import sys
 import argparse
 import re
+from collections import namedtuple
 
 from .. import PyPI, PackageNotFound
 from ..dependencies import get_dependencies
@@ -13,39 +15,59 @@ def _dependency_string_to_name_and_version(s):
         return s, None
     return match.group('name'), match.group('version')
 
+class License(object):
+    FIELDS = ('name', 'version', 'license', 'notice', 'homepage', 'package_url')
+    def __init__(self, **kwargs):
+        for key in self.FIELDS:
+            if key not in kwargs:
+                setattr(self, key, None)
+        for key, value in kwargs.iteritems():
+            if key not in self.FIELDS:
+                raise TypeError('Unexpected argument for {}: {}'.format(type(self).__name__, key))
+            setattr(self, key, value)
+    def __getitem__(self, item):
+        if item not in self.FIELDS:
+            raise KeyError('{} has no such field: {}'.format(type(self).__name__, item))
+        return getattr(self, item)
+
 def get_license(package_name, version=None, safe=False):
+    license = License(
+            name=package_name,
+            version=version,
+            )
     pypi_client = PyPI()
     try:
         info = pypi_client.get_release_data(package_name, version=version)
     except PackageNotFound:
         if safe:
-            return None
+            return license
         raise
     if not info:
-        return 'N/A'
+        return license
+    license.version = info.get('version', version)
     if 'classifiers' in info:
         classifiers = [c.split(' :: ') for c in info['classifiers']]
         license_classifiers = [c for c in classifiers if c[0] == 'License']
         if license_classifiers:
-            return ', '.join(set(c[-1] for c in license_classifiers))
+            license.license = ', '.join(set(c[-1] for c in license_classifiers))
     if 'license' in info:
-        return info['license']
-    return 'N/A'
+        license.notice = info['license']
+        license.license = license.license or license.notice
+    license.homepage = info.get('home_page')
+    license.package_url = info.get('release_url')
+    return license
 
 def get_dependency_licenses(package_name, progress_callback=None):
-    ''' Return licenses of package dependencies, as a list of tuples
-    (dependency, version, license) '''
-    licenses = []
+    ''' Return licenses of package dependencies '''
     dependencies = list(get_dependencies(package_name))[1:]
     for i, (dependency, dependency_str) in enumerate(dependencies, 1):
         version = _dependency_string_to_name_and_version(dependency_str)[1]
         if progress_callback:
             progress_callback(dependency, version, i, len(dependencies), True)
-        license = get_license(dependency, version=version, safe=True) or '[PACKAGE NOT FOUND]'
-        licenses.append((dependency, version, license))
+        license = get_license(dependency, version=version, safe=True)
+        yield license
         if progress_callback:
             progress_callback(dependency, version, i, len(dependencies), False)
-    return licenses
 
 def _progress_callback(dep_name, dep_version, dep_index, total_deps, is_before):
     text = '[{}/{}] {} {}'.format(dep_index, total_deps, dep_name, dep_version or '')
@@ -57,10 +79,46 @@ def _progress_callback(dep_name, dep_version, dep_index, total_deps, is_before):
 def run():
     parser = argparse.ArgumentParser()
     parser.add_argument('name', help='Package name')
+    parser.add_argument('--csv', action='store_true', help='Output in CSV format')
+    parser.add_argument('--table', action='store_true', help='Output as a table')
     args = parser.parse_args()
     licenses = get_dependency_licenses(args.name, progress_callback=_progress_callback)
-    for dependency, version, license in sorted(licenses, key=lambda keyval: keyval[0].lower()):
-        print('{}{}{}: {}'.format(dependency, ' ' if version else '', version or '', license))
+    iterator = sorted(licenses, key=lambda license: license.name.lower())
+    if args.csv:
+        output_csv(args.name, iterator)
+    elif args.table:
+        output_table(iterator)
+    else:
+        output_normal(iterator)
+
+def output_normal(licenses):
+    for l in licenses:
+        print('{} {}: {}'.format(l.name, l.version or '', l.license or 'UNKNOWN'))
+
+def output_csv(package_name, licenses):
+    import csv
+    filename = os.path.abspath('{}-dependencies.csv'.format(package_name))
+    with open(filename, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow([f.replace('_', ' ').title() for f in License.FIELDS])
+        for license in licenses:
+            writer.writerow([getattr(license, f) for f in License.FIELDS])
+    print('Saved licenses in {}'.format(filename), file=sys.stderr)
+
+def output_table(licenses):
+    from prettytable import PrettyTable
+    excluded_fields = ('notice',)
+    fields = [f for f in License.FIELDS if f not in excluded_fields]
+    t = PrettyTable([f.replace('_', ' ').title() for f in fields])
+    t.align = 'l'
+    def getfield(_l, _f):
+        _v = getattr(_l, _f)
+        if _v is None:
+            return ''
+        return _v
+    for license in licenses:
+        t.add_row([getfield(license, f) for f in fields])
+    print(t.get_string())
 
 def main():
     try:

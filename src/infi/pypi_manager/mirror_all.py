@@ -152,7 +152,8 @@ def get_repository_config(server_name):
 
 def mirror_package(server_name, package_name, version=None):
     pypi = PyPI()
-    release_data = pypi.get_release_data(package_name, version)
+    version = version or pypi.get_latest_version(package_name)
+    version_data = pypi.get_release_data(package_name, version)
     release_dataset = pypi._client.release_urls(package_name, version)
     repository_config = get_repository_config(server_name)
     final_result = True
