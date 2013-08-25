@@ -11,7 +11,7 @@ import cStringIO as StringIO
 import urllib
 
 from infi.pyutils.contexts import contextmanager
-from infi.pypi_manager import PyPI
+from infi.pypi_manager import PyPI, DistributionNotFound
 
 from logging import getLogger
 logger = getLogger()
@@ -157,6 +157,10 @@ def mirror_package(server_name, package_name, version=None):
     release_dataset = pypi._client.release_urls(package_name, version)
     repository_config = get_repository_config(server_name)
     final_result = True
+
+    if not release_dataset:
+        msg = "No distributions found for {} {} (maybe you should try to build from download url?)"
+        raise DistributionNotFound(msg.format(package_name, version))
 
     for release_data in release_dataset:
         result = mirror_release(repository_config, package_name, version, version_data, release_data)

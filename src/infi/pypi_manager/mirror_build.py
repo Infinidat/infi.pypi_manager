@@ -1,23 +1,27 @@
 from infi.pyutils.contexts import contextmanager
 from logging import getLogger
-from . import PyPI, DjangoPyPI
+from . import PyPI, DjangoPyPI, DistributionNotFound
 
 logger = getLogger()
 
 
-def download_package_from_global_pypi(package_name, release_version=None):
-    from urllib2 import urlopen
+def download_package_from_global_pypi(package_name, release_version=None, use_download_url=False):
+    from urllib import urlretrieve
     from tempfile import mkstemp
     from os import write, close
     pypi = PyPI()
-    if release_version is None:
-        url = pypi.get_latest_source_distribution_url(package_name)
+    release_version = release_version or pypi.get_latest_version(package_name)
+    if use_download_url:
+        release_data = pypi.get_release_data(package_name, release_version)
+        if "download_url" not in release_data or release_data["download_url"] == "UNKNOWN":
+            msg = "No valid download url found for package {} {}"
+            raise DistributionNotFound(msg.format(package_name, release_version))
+        url = release_data["download_url"]
     else:
         url = pypi.get_source_distribution_url_of_specific_release_version(package_name, release_version)
-    data = urlopen(url).read()
     fd, path = mkstemp(suffix=url.split('/')[-1])
-    write(fd, data)
     close(fd)
+    urlretrieve(url, path)
     logger.info("Downloaded {} to {}".format(url, path))
     return path
 
@@ -58,8 +62,8 @@ def extract_source_package_to_tempdir(package_source_archive, dest_dir):
     raise InvalidArchive(package_source_archive, dest_dir)
 
 
-def mirror_package(package_name, distribution_type, release_version, index_server):
-    package_source_archive = download_package_from_global_pypi(package_name, release_version)
+def mirror_package(package_name, distribution_type, release_version, index_server, use_download_url):
+    package_source_archive = download_package_from_global_pypi(package_name, release_version, use_download_url)
     with tempdir() as base:
         setup_py_dir = extract_source_package_to_tempdir(package_source_archive, base)
         with chdir(setup_py_dir):

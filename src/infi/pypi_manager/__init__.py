@@ -9,8 +9,10 @@ logger = getLogger()
 class PackageNotFound(Exception):
     pass
 
+class DistributionNotFound(Exception):
+    pass
 
-class SourceDistributionNotFound(Exception):
+class SourceDistributionNotFound(DistributionNotFound):
     pass
 
 
