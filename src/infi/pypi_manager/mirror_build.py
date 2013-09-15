@@ -1,6 +1,6 @@
 from infi.pyutils.contexts import contextmanager
 from logging import getLogger
-from . import PyPI, DjangoPyPI, DistributionNotFound
+from . import PyPI, DjangoPyPI, DistributionNotFound, UnsupportedArchive, InvalidArchive
 
 logger = getLogger()
 
