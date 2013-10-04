@@ -33,7 +33,7 @@ def hard_install(name):
     import os
     dependencies = list(reversed(list(get_dependencies(name))))
     print "Found {} dependencies.".format(len(dependencies))
-    for package_name, package in dependencies:
+    for parent, package_name, package in dependencies:
         run_easy_install(package_name, package)
 
 def main():
