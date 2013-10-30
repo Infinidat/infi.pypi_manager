@@ -31,9 +31,9 @@ class PyPIBase(object):
         self.server = server
 
     def get_all_packages(self):
-        from urllib import urlopen
+        import requests
         import re
-        simple_html = urlopen(self.server + "/simple").read()
+        simple_html = requests.get(self.server + "/simple").content
         return re.findall("""href=["'](?:/simple/)?(.*?)/["']""", simple_html)
 
 
@@ -43,9 +43,9 @@ class DjangoPyPI(PyPIBase):
 
     def get_info_from_doap(self, package_name):
         """:returns a list of dictionaries of: has_sig, md5_digest, packagetype, url, version, filename"""
-        from urllib import urlopen
+        import requests
         import xml.etree.ElementTree as ElementTree
-        doap = urlopen("{}/pypi/{}/doap.rdf".format(self.server, package_name)).read()
+        doap = requests.get("{}/pypi/{}/doap.rdf".format(self.server, package_name)).content
         if 'Not Found' in doap:
             raise PackageNotFound(package_name)
         root = ElementTree.fromstring(doap)
