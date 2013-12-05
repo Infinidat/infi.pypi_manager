@@ -37,7 +37,8 @@ def main():
     else:
         dependency_tree = dict()
         for parent, dependency_name, dependency_str in dependencies:
-            dependency_tree.setdefault(parent, list()).append(dependency_name)
+            parent_name = parent if parent is None else parent.split('>')[0].split('=')[0]
+            dependency_tree.setdefault(parent_name, list()).append(dependency_name)
         print_tree(dependency_tree, sys.argv[1], 0)
 
 if __name__ == "__main__":
