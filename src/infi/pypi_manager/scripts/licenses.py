@@ -60,7 +60,7 @@ def get_license(package_name, version=None, safe=False):
 def get_dependency_licenses(package_name, progress_callback=None):
     ''' Return licenses of package dependencies '''
     dependencies = list(get_dependencies(package_name))[1:]
-    for i, (dependency, dependency_str) in enumerate(dependencies, 1):
+    for i, (_, dependency, dependency_str) in enumerate(dependencies, 1):
         version = _dependency_string_to_name_and_version(dependency_str)[1]
         if progress_callback:
             progress_callback(dependency, version, i, len(dependencies), True)
