@@ -4,7 +4,7 @@ from pkg_resources import get_distribution
 from ..dependencies import get_dependencies
 
 def run_easy_install(package_name, package):
-    cmd = "easy_install -U '{}'".format(package)
+    cmd = "easy_install -U \"{}\"".format(package)
     print "Running:", cmd,
     output = execute_assert_success(cmd, shell=True).get_stdout()
 
