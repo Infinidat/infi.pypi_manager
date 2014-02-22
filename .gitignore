@@ -48,3 +48,4 @@ parts/*.msi
 src/infi/pypi_manager/__version__.py
 .cache
 eggs
+parts
