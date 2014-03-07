@@ -43,7 +43,7 @@ class DjangoPyPI_TestCase(unittest.TestCase):
     def test_get_source_url(self):
         pypi = DjangoPyPI("pypi01.infinidat.com")
         self.assertEqual(pypi.get_latest_source_distribution_url('ipython'),
-                'http://pypi01.infinidat.com//media/dists/ipython-1.2.0.tar.gz#md5=6b4cb02d5c48ca1776fb6127d37e9319')
+                'http://pypi01.infinidat.com//media/dists/ipython-1.2.1.tar.gz#md5=6b4cb02d5c48ca1776fb6127d37e9319')
 
     def test_download(self):
         import stat
