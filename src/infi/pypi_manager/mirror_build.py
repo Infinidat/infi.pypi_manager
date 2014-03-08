@@ -8,7 +8,7 @@ logger = getLogger()
 def download_package_from_global_pypi(package_name, release_version=None, use_download_url=False):
     from urllib import urlretrieve
     from tempfile import mkstemp
-    from os import write, close
+    from os import close
     pypi = PyPI()
     release_version = release_version or pypi.get_latest_version(package_name)
     if use_download_url:

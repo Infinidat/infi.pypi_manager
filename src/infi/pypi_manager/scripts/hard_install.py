@@ -1,6 +1,6 @@
 import re
 from infi.execute import execute_assert_success
-from pkg_resources import get_distribution
+import pkg_resources
 from ..dependencies import get_dependencies
 
 def run_easy_install(package_name, package):
@@ -11,7 +11,7 @@ def run_easy_install(package_name, package):
     try:
         # try to get the name of the package from what is already installed
         # e.g. setuptools will become distribute
-        package_name = get_distribution(package_name).project_name
+        package_name = pkg_resources.get_distribution(package_name).project_name
     except pkg_resources.DistributionNotFound:
         pass
 
@@ -30,7 +30,6 @@ def run_easy_install(package_name, package):
         print "(updated)"
 
 def hard_install(name):
-    import os
     dependencies = list(reversed(list(get_dependencies(name))))
     print "Found {} dependencies.".format(len(dependencies))
     for parent, package_name, package in dependencies:
