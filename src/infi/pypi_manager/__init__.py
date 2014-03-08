@@ -14,10 +14,8 @@ class DistributionNotFound(Exception):
 class SourceDistributionNotFound(DistributionNotFound):
     pass
 
-
 class UnsupportedArchive(Exception):
     pass
-
 
 class InvalidArchive(Exception):
     pass
