@@ -1,7 +1,7 @@
 import unittest
 
 from .. import PyPI, PackageNotFound
-from ..mirror_build import download_package_from_global_pypi, DjangoPyPI
+from ..mirror.mirror_build import download_package_from_global_pypi, DjangoPyPI
 
 class PyPI_TestCase(unittest.TestCase):
     def test_get_package__exists(self):
