@@ -3,7 +3,6 @@ import os
 import sys
 import argparse
 import re
-from collections import namedtuple
 
 from .. import PyPI, PackageNotFound
 from ..dependencies import get_dependencies

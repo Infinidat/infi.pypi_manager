@@ -1,6 +1,5 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
-from infi.pyutils.contexts import contextmanager
 from logging import getLogger
 
 logger = getLogger()
