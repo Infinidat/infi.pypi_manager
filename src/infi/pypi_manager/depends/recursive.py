@@ -20,11 +20,13 @@ class Env(object):
 
     def get_dependencies(self, package_name):
         from infi.execute import execute_assert_success
-        from . import dependencies
+        from . import __file__
         from os import path
         python = path.join(self._bindir, "python")
-        pid = execute_assert_success([python, dependencies.__file__, package_name])
-        return eval(pid.get_stdout().strip())
+        exec_file = __file__[:-1] if __file__.endswith("pyc") else __file__
+        pid = execute_assert_success([python, exec_file, package_name])
+        output = pid.get_stdout().strip()
+        return output.splitlines()
 
     def get_installed_version(self, package_name):
         from infi.execute import execute_assert_success
@@ -43,8 +45,8 @@ class Env(object):
 @contextmanager
 def virtualenv():
     from infi.execute import execute_assert_success
-    from .mirror_build import tempdir
+    from ..mirror.mirror_build import tempdir
     with tempdir() as path:
         logger.info("Creating virtualenv in {0}".format(path))
-        execute_assert_success(["virtualenv", "--no-site-packages", "--distribute", path])
+        execute_assert_success(["virtualenv", "--no-site-packages", path])
         yield Env.from_virtualenv(path)

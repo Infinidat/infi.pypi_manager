@@ -1,4 +1,4 @@
-""" mirror_package
+"""mirror_package
 Pull packages from pypi.python.org and push them to your local DjangoPyPI server
 
 Usage:
@@ -40,12 +40,12 @@ def _mirror_package(arguments):
     use_download_url = arguments.get("--use-download-url")
     recursive = arguments.get("--recursive")
     if distribution_type is not None:
-        from ..mirror_build import mirror_package
+        from .mirror_build import mirror_package
         # mirror_build.mirror_package downloads the source distribution of the package
         # and uses setup.py to build a specific distribution and upload then upload it
         mirror_package(package_name, distribution_type, release_version, index_server, use_download_url)
     else:
-        from ..mirror_all import mirror_package
+        from .mirror_all import mirror_package
         # mirror_all.mirror_package downloads all the release files on the
         # remote server and posts them with their associated data
         # to the local server, "faking" the setuptools requests for each
@@ -55,7 +55,7 @@ def _mirror_package(arguments):
 
 
 def _recursive(package_name, release_version, arguments):
-    from ..recursive import virtualenv
+    from ..depends.recursive import virtualenv
     with virtualenv() as env:
         env.easy_install(package_name, release_version)
         for dependency in env.get_dependencies(package_name):

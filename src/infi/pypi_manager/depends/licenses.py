@@ -1,11 +1,10 @@
 from __future__ import print_function
 import os
 import sys
-import argparse
 import re
 
 from .. import PyPI, PackageNotFound
-from ..dependencies import get_dependencies
+from . import get_dependencies
 
 _dependency_string_pattern = re.compile('^(?P<name>.*?)((==|<=|>=|=<|=>)(?P<version>.*))?$')
 def _dependency_string_to_name_and_version(s):
@@ -56,9 +55,9 @@ def get_license(package_name, version=None, safe=False):
     license.package_url = info.get('release_url')
     return license
 
-def get_dependency_licenses(package_name, progress_callback=None):
+def get_dependency_licenses(dependencies, progress_callback=None):
     ''' Return licenses of package dependencies '''
-    dependencies = list(get_dependencies(package_name))[1:]
+    dependencies = dependencies[1:]       # remove self
     for i, (_, dependency, dependency_str) in enumerate(dependencies, 1):
         version = _dependency_string_to_name_and_version(dependency_str)[1]
         if progress_callback:
@@ -74,21 +73,6 @@ def _progress_callback(dep_name, dep_version, dep_index, total_deps, is_before):
         print('\r' + text, end='', file=sys.stderr)
     else:
         print('\r{}\r'.format(' ' * len(text)), end='', file=sys.stderr)
-
-def run():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('name', help='Package name')
-    parser.add_argument('--csv', action='store_true', help='Output in CSV format')
-    parser.add_argument('--table', action='store_true', help='Output as a table')
-    args = parser.parse_args()
-    licenses = get_dependency_licenses(args.name, progress_callback=_progress_callback)
-    iterator = sorted(licenses, key=lambda license: license.name.lower())
-    if args.csv:
-        output_csv(args.name, iterator)
-    elif args.table:
-        output_table(iterator)
-    else:
-        output_normal(iterator)
 
 def output_normal(licenses):
     for l in licenses:
@@ -119,18 +103,12 @@ def output_table(licenses):
         t.add_row([getfield(license, f) for f in fields])
     print(t.get_string())
 
-def main():
-    try:
-        run()
-    except SystemExit:
-        raise
-    except KeyboardInterrupt:
-        return 1
-    except:
-        import traceback
-        traceback.print_exc()
-        return 1
-    return 0
-
-if __name__ == '__main__':
-    sys.exit(main())
+def run(options, licenses):
+    licenses = get_dependency_licenses(licenses, progress_callback=_progress_callback)
+    iterator = sorted(licenses, key=lambda license: license.name.lower())
+    if options["--csv"]:
+        output_csv(options["<package>"], iterator)
+    elif options["--table"]:
+        output_table(iterator)
+    else:
+        output_normal(iterator)
