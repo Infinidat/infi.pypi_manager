@@ -1,7 +1,7 @@
 import re
 from infi.execute import execute_assert_success
 import pkg_resources
-from ..dependencies import get_dependencies
+from ..depends.dependencies import get_dependencies
 
 def run_easy_install(package_name, package):
     cmd = "easy_install -U \"{}\"".format(package)
