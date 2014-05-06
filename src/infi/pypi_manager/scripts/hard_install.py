@@ -1,4 +1,5 @@
 import re
+import sys
 from infi.execute import execute_assert_success
 import pkg_resources
 from ..depends.dependencies import get_dependencies
@@ -6,6 +7,7 @@ from ..depends.dependencies import get_dependencies
 def run_easy_install(package_name, package):
     cmd = "easy_install -U \"{}\"".format(package)
     print "Running:", cmd,
+    sys.stdout.flush()
     output = execute_assert_success(cmd, shell=True).get_stdout()
 
     try:
