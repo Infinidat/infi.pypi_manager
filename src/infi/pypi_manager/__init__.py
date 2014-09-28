@@ -27,12 +27,6 @@ class PyPIBase(object):
             server = "http://" + server
         self.server = server
 
-    def get_all_packages(self):
-        import requests
-        import re
-        simple_html = requests.get(self.server + "/simple").content
-        return re.findall("""href=["'](?:/simple/)?(.*?)/["']""", simple_html)
-
 
 class DjangoPyPI(PyPIBase):
     def __init__(self, server):
@@ -86,6 +80,12 @@ class DjangoPyPI(PyPIBase):
             return release['url']
         raise SourceDistributionNotFound(package_name, release_version)
 
+    def get_all_packages(self):
+        import requests
+        import re
+        simple_html = requests.get(self.server + "/simple").content
+        return re.findall("""href=["'](?:/simple/)?(.*?)/["']""", simple_html)
+
 
 class PyPI(PyPIBase):
     def __init__(self, server="http://pypi.python.org"):
@@ -121,3 +121,5 @@ class PyPI(PyPIBase):
             version = self.get_latest_version(package_name)
         return self._client.release_data(package_name, version)
 
+    def get_all_packages(self):
+        return self._client.list_packages()
