@@ -2,11 +2,13 @@ from .. import PyPI, DjangoPyPI
 from prettytable import PrettyTable
 from pkg_resources import parse_version
 import requests
+import urllib
 import re
 
 def get_versions_from_reference(reference_repo):
     reference_pypi_html = requests.get("{}/pypi".format(reference_repo.server)).content
-    return dict(re.findall("""href=["'](?:/pypi/)?([^/]+)/([^/]+)/["']""", reference_pypi_html))
+    search_result = re.findall("""href=["'](?:/pypi/)?([^/]+)/([^/]+)/["']""", reference_pypi_html)
+    return dict((k, urllib.unquote(v)) for k, v in search_result)
 
 def get_version_dict_from_other(other_repo, repos_to_check):
     search_result = other_repo._client.search(dict(name=repos_to_check))
