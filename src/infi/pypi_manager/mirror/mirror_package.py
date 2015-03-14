@@ -34,7 +34,6 @@ def _logging():
 def _mirror_package(arguments):
     index_server = arguments.get("--index-server")
     package_name = arguments.get("<package_name>")
-    distribution_type = arguments.get("<distribution_type>")
     release_version = arguments.get("<release_version>")
     distribution_type = arguments.get("--build")
     use_download_url = arguments.get("--use-download-url")
