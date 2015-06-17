@@ -12,8 +12,9 @@ def get_versions_from_reference(reference_repo):
 
 def get_version_dict_from_other(other_repo, repos_to_check):
     search_result = list()
-    for i in range(0, len(repos_to_check), 50):
-        search_result.extend(other_repo._client.search(dict(name=repos_to_check[i:i+50]), "or"))
+    for i in range(0, len(repos_to_check), 10):
+        res = other_repo._client.search(dict(name=repos_to_check[i:i+10]), "or")
+        search_result.extend(res)
     return dict([(repo["name"], repo["version"]) for repo in search_result if repo["name"] in repos_to_check])
 
 def compare_pypi_repos(reference_repo, other_repo):
