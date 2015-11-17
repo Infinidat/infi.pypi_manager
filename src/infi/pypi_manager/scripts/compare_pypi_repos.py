@@ -14,10 +14,10 @@ def compare_pypi_repos(reference_repo, other_repo):
     upgrade_table = PrettyTable(["Package", reference_repo.server, other_repo.server])
     downgrade_table = PrettyTable(["Package", reference_repo.server, other_repo.server])
     reference_repo_versions = get_versions_from_reference(reference_repo)
-    repos_to_check = reference_repo_versions.keys()
-    for name in sorted(repos_to_check):
+    packages_to_check = reference_repo_versions.keys()
+    for name in sorted(packages_to_check):
         try:
-            reference_repo_version = reference_repo.get_latest_version(name)
+            reference_repo_version = reference_repo_versions[name]
             other_repo_version = other_repo.get_latest_version(name)
         except PackageNotFound:
             continue
