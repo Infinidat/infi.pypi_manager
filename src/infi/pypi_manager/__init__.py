@@ -1,6 +1,11 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
 from logging import getLogger
+try:
+    from xmlrpclib import ServerProxy
+except ImportError:
+    # Python 3
+    from xmlrpc.client import ServerProxy
 
 logger = getLogger()
 
@@ -37,7 +42,7 @@ class DjangoPyPI(PyPIBase):
         import requests
         import xml.etree.ElementTree as ElementTree
         doap = requests.get("{}/pypi/{}/doap.rdf".format(self.server, package_name)).content
-        if 'Not Found' in doap:
+        if b'Not Found' in doap:
             raise PackageNotFound(package_name)
         root = ElementTree.fromstring(doap)
         items = []
@@ -75,8 +80,7 @@ class DjangoPyPI(PyPIBase):
         return self.get_source_distribution_url_of_specific_release_version(package_name, release_version)
 
     def get_source_distribution_url_of_specific_release_version(self, package_name, release_version):
-        for release in filter(lambda release: release['packagetype'] == 'sdist',
-                              self.get_releases_for_version(package_name, release_version)):
+        for release in [release for release in self.get_releases_for_version(package_name, release_version) if release['packagetype'] == 'sdist']:
             return release['url']
         raise SourceDistributionNotFound(package_name, release_version)
 
@@ -90,8 +94,7 @@ class DjangoPyPI(PyPIBase):
 class PyPI(PyPIBase):
     def __init__(self, server="http://pypi.python.org"):
         super(PyPI, self).__init__(server)
-        import xmlrpclib
-        self._client = xmlrpclib.ServerProxy("{}/pypi".format(self.server))
+        self._client = ServerProxy("{}/pypi".format(self.server))
 
     def get_available_versions(self, package_name):
         releases = self._client.package_releases(package_name)
@@ -111,8 +114,7 @@ class PyPI(PyPIBase):
         return self.get_source_distribution_url_of_specific_release_version(package_name, release_version)
 
     def get_source_distribution_url_of_specific_release_version(self, package_name, release_version):
-        for release in filter(lambda release: release['packagetype'] == 'sdist',
-                              self.get_releases_for_version(package_name, release_version)):
+        for release in [release for release in self.get_releases_for_version(package_name, release_version) if release['packagetype'] == 'sdist']:
             return release['url']
         raise SourceDistributionNotFound(package_name, release_version)
 

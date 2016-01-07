@@ -19,7 +19,7 @@ class License(object):
         for key in self.FIELDS:
             if key not in kwargs:
                 setattr(self, key, None)
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if key not in self.FIELDS:
                 raise TypeError('Unexpected argument for {}: {}'.format(type(self).__name__, key))
             setattr(self, key, value)
