@@ -2,12 +2,21 @@ from infi.pyutils.contexts import contextmanager
 from logging import getLogger
 from .. import PyPI, DjangoPyPI, DistributionNotFound, UnsupportedArchive, InvalidArchive
 
+try:
+    from ConfigParser import ConfigParser
+    from urlparse import urlparse
+    from urllib import urlretrieve
+except ImportError:
+    # Python 3
+    from configparser import ConfigParser
+    from urllib.parse import urlparse
+    from urllib.request import urlretrieve
+
+
 logger = getLogger()
 
 
 def get_index_url_from_pydistutils():
-    from ConfigParser import ConfigParser
-    from urlparse import urlparse
     from os import path, name
     config = ConfigParser()
     config.read([path.expanduser(path.join('~', '%spydistutils.cfg' % ('' if name == 'nt' else '.')))])
@@ -16,7 +25,6 @@ def get_index_url_from_pydistutils():
 
 
 def download_package_from_local_pypi(index_server, package_name, release_version=None):
-    from urllib import urlretrieve
     from tempfile import mkstemp
     from os import close
     index_url = get_index_url_from_pydistutils()
@@ -32,7 +40,6 @@ def download_package_from_local_pypi(index_server, package_name, release_version
 
 
 def download_package_from_global_pypi(package_name, release_version=None, use_download_url=False):
-    from urllib import urlretrieve
     from tempfile import mkstemp
     from os import close
     pypi = PyPI()

@@ -3,12 +3,19 @@ try:
 except ImportError:
     from md5 import md5
 import os
-import socket
-import httplib
 import base64
-import urlparse
-import cStringIO as StringIO
-import urllib
+import socket
+try:
+    from httplib import HTTPConnection, HTTPSConnection
+    from urlparse import urlparse
+    from cStringIO import StringIO
+    from urllib import urlretrieve
+except ImportError:
+    # Python 3
+    from http.client import HTTPConnection, HTTPSConnection
+    from urllib.parse import urlparse
+    from io import StringIO
+    from urllib.request import urlretrieve
 
 from infi.pyutils.contexts import contextmanager
 from infi.pypi_manager import PyPI, DistributionNotFound
@@ -27,7 +34,7 @@ def send_setuptools_request(repository, username, password, data):
     boundary = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
     sep_boundary = '\n--' + boundary
     end_boundary = sep_boundary + '--'
-    body = StringIO.StringIO()
+    body = StringIO()
     for key, value in data.items():
         # handle multiple entries for the same name
         if type(value) != type([]):
@@ -56,14 +63,14 @@ def send_setuptools_request(repository, username, password, data):
     # We can't use urllib2 since we need to send the Basic
     # auth right with the first request
     schema, netloc, url, params, query, fragments = \
-        urlparse.urlparse(repository)
+        urlparse(repository)
     assert not params and not query and not fragments
     if schema == 'http':
-        http = httplib.HTTPConnection(netloc)
+        http = HTTPConnection(netloc)
     elif schema == 'https':
-        http = httplib.HTTPSConnection(netloc)
+        http = HTTPSConnection(netloc)
     else:
-        raise AssertionError, "unsupported schema "+schema
+        raise AssertionError("unsupported schema "+schema)
 
     data = ''
     try:
@@ -75,7 +82,7 @@ def send_setuptools_request(repository, username, password, data):
         http.putheader('Authorization', auth)
         http.endheaders()
         http.send(body)
-    except socket.error, e:
+    except socket.error as e:
         logger.exception("")
         return
 
@@ -107,8 +114,8 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
 
     data.update(metadata)
 
-    for key, value in data.items():
-        if isinstance(value, unicode):
+    for key, value in list(data.items()):
+        if isinstance(value, str):
             data[key] = value.encode("utf-8")
 
     repository = repository_config["repository"]
@@ -119,7 +126,7 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
 @contextmanager
 def temp_urlretrieve(url, localpath):
     logger.info("Retrieving {}".format(url))
-    urllib.urlretrieve(url, localpath)
+    urlretrieve(url, localpath)
     try:
         yield
     finally:

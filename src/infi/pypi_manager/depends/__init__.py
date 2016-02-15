@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 def get_dependencies(name, allow_duplicates=False):
     from collections import deque
     from pkg_resources import get_distribution
@@ -26,4 +28,4 @@ if __name__ == "__main__":
     dependencies = [dependency_str for parent, dependency_name, dependency_str in dependencies]
     dependencies = dependencies[1:]         # remove self
     dependencies.sort()
-    print '\n'.join(dependencies)
+    print('\n'.join(dependencies))
