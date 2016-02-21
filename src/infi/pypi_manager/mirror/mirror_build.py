@@ -108,6 +108,7 @@ def mirror_package(package_name, distribution_type, release_version, index_serve
 
 
 def add_import_setuptools_to_setup_py():
+    from os import linesep
     with open("setup.py") as fd:
         content = fd.read()
     if 'distutils' in content:
