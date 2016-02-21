@@ -100,7 +100,11 @@ def mirror_package(package_name, distribution_type, release_version, index_serve
     with tempdir() as base:
         setup_py_dir = extract_source_package_to_tempdir(package_source_archive, base)
         with chdir(setup_py_dir):
-            upload_package_to_local_pypi(distribution_type, index_server)
+            try:
+                upload_package_to_local_pypi(distribution_type, index_server)
+            except:
+                add_import_setuptools_to_setup_py()
+                upload_package_to_local_pypi(distribution_type, index_server)
 
 
 def add_import_setuptools_to_setup_py():
