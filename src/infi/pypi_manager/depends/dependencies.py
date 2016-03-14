@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 """
 Usage:
     pydepends <package>
@@ -16,6 +14,8 @@ Options:
     --find=<dependency>       find which dependent packages depend on a specific package
     <dependency>              name of a package to find
 """
+
+from __future__ import print_function
 
 import docopt
 from . import get_dependencies, licenses
