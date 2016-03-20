@@ -115,7 +115,7 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
     data.update(metadata)
 
     for key, value in list(data.items()):
-        if isinstance(value, str):
+        if not isinstance(value, str):
             data[key] = value.encode("utf-8")
 
     repository = repository_config["repository"]
