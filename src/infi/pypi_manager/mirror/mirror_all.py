@@ -10,12 +10,14 @@ try:
     from urlparse import urlparse
     from cStringIO import StringIO
     from urllib import urlretrieve
+    string_types = (str, unicode)
 except ImportError:
     # Python 3
     from http.client import HTTPConnection, HTTPSConnection
     from urllib.parse import urlparse
     from io import StringIO
     from urllib.request import urlretrieve
+    string_types = (str,)
 
 from infi.pyutils.contexts import contextmanager
 from infi.pypi_manager import PyPI, DistributionNotFound
@@ -115,7 +117,7 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
     data.update(metadata)
 
     for key, value in list(data.items()):
-        if not isinstance(value, str):
+        if isinstance(value, string_types) and not isinstance(value, str):
             data[key] = value.encode("utf-8")
 
     repository = repository_config["repository"]
