@@ -100,7 +100,24 @@ def mirror_package(package_name, distribution_type, release_version, index_serve
     with tempdir() as base:
         setup_py_dir = extract_source_package_to_tempdir(package_source_archive, base)
         with chdir(setup_py_dir):
-            upload_package_to_local_pypi(distribution_type, index_server)
+            try:
+                upload_package_to_local_pypi(distribution_type, index_server)
+            except:
+                add_import_setuptools_to_setup_py()
+                upload_package_to_local_pypi(distribution_type, index_server)
+
+
+def add_import_setuptools_to_setup_py():
+    from os import linesep
+    with open("setup.py") as fd:
+        content = fd.read()
+    if 'distutils' in content:
+        content = content.replace("distutils.core", "setuptools")
+        content = content.replace("from distutils import core", "import setuptools as core")
+    else:
+        content = 'import setuptools' + linesep + content
+    with open("setup.py", 'w') as fd:
+        fd.write(content)
 
 
 def rebuild_package_binary_distributions(index_server, package_name, release_version, distribution_type='bdist_egg'):
@@ -108,7 +125,11 @@ def rebuild_package_binary_distributions(index_server, package_name, release_ver
     with tempdir() as base:
         setup_py_dir = extract_source_package_to_tempdir(package_source_archive, base)
         with chdir(setup_py_dir):
-            upload_package_to_local_pypi(distribution_type, index_server)
+            try:
+                upload_package_to_local_pypi(distribution_type, index_server)
+            except:
+                add_import_setuptools_to_setup_py()
+                upload_package_to_local_pypi(distribution_type, index_server)
 
 
 @contextmanager
