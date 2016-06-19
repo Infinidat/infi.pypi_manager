@@ -59,7 +59,7 @@ class DjangoPyPI(PyPIBase):
         return items
 
     def get_available_versions(self, package_name):
-        releases = [item['version'] for item in self.get_info_from_doap(package_name)]
+        releases = list(set(item['version'] for item in self.get_info_from_doap(package_name)))
         logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
         if len(releases) == 0:
             raise PackageNotFound(package_name)
