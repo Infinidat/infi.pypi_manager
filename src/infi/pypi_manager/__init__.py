@@ -28,7 +28,7 @@ class InvalidArchive(Exception):
 
 class PyPIBase(object):
     def __init__(self, server):
-        if not server.startswith("http://"):
+        if not server.startswith("http"):
             server = "http://" + server
         self.server = server
 
