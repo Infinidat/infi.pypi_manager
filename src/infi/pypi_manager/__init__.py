@@ -92,7 +92,7 @@ class DjangoPyPI(PyPIBase):
 
 
 class PyPI(PyPIBase):
-    def __init__(self, server="http://pypi.python.org"):
+    def __init__(self, server="https://pypi.python.org"):
         super(PyPI, self).__init__(server)
         self._client = ServerProxy("{}/pypi".format(self.server))
 
