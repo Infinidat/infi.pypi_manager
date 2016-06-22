@@ -28,7 +28,7 @@ class InvalidArchive(Exception):
 
 class PyPIBase(object):
     def __init__(self, server):
-        if not server.startswith("http://"):
+        if not server.startswith("http"):
             server = "http://" + server
         self.server = server
 
@@ -59,7 +59,7 @@ class DjangoPyPI(PyPIBase):
         return items
 
     def get_available_versions(self, package_name):
-        releases = [item['version'] for item in self.get_info_from_doap(package_name)]
+        releases = list(set(item['version'] for item in self.get_info_from_doap(package_name)))
         logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
         if len(releases) == 0:
             raise PackageNotFound(package_name)
@@ -92,7 +92,7 @@ class DjangoPyPI(PyPIBase):
 
 
 class PyPI(PyPIBase):
-    def __init__(self, server="http://pypi.python.org"):
+    def __init__(self, server="https://pypi.python.org"):
         super(PyPI, self).__init__(server)
         self._client = ServerProxy("{}/pypi".format(self.server))
 
