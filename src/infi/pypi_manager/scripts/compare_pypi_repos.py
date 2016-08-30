@@ -12,7 +12,7 @@ except ImportError:
     from urllib.parse import unquote
 
 def get_versions_from_reference(reference_repo):
-    reference_pypi_html = requests.get("{}/pypi".format(reference_repo.server)).content
+    reference_pypi_html = requests.get("{}/pypi".format(reference_repo.server)).text
     search_result = re.findall("""href=["'](?:/pypi/)?([^/]+)/([^/]+)/["']""", reference_pypi_html)
     return dict((k, unquote(v)) for k, v in search_result)
 
