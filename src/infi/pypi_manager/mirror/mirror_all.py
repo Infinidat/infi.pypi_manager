@@ -30,7 +30,7 @@ def send_setuptools_request(repository, username, password, data):
     # changed logging and return value
 
     # set up the authentication
-    auth = "Basic " + base64.encodestring(username + ":" + password).strip()
+    auth = "Basic " + base64.encodestring((username + ":" + password).encode("ascii")).strip().decode("ascii")
 
     # Build up the MIME payload for the POST data
     boundary = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
@@ -83,7 +83,7 @@ def send_setuptools_request(repository, username, password, data):
         http.putheader('Content-length', str(len(body)))
         http.putheader('Authorization', auth)
         http.endheaders()
-        http.send(body)
+        http.send(body.encode("ascii"))
     except socket.error as e:
         logger.exception("")
         return

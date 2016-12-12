@@ -10,7 +10,7 @@ def run_easy_install(package_name, package):
     cmd = "easy_install -U \"{}\"".format(package)
     print("Running:", cmd, end=' ')
     sys.stdout.flush()
-    output = execute_assert_success(cmd, shell=True).get_stdout()
+    output = execute_assert_success(cmd, shell=True).get_stdout().decode("ascii")
 
     try:
         # try to get the name of the package from what is already installed
