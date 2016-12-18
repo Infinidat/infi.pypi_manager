@@ -83,7 +83,7 @@ def send_setuptools_request(repository, username, password, data):
         http.putheader('Content-length', str(len(body)))
         http.putheader('Authorization', auth)
         http.endheaders()
-        http.send(body.encode("ascii"))
+        http.send(body)
     except socket.error as e:
         logger.exception("")
         return

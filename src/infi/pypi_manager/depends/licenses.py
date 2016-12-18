@@ -28,18 +28,30 @@ class License(object):
             raise KeyError('{} has no such field: {}'.format(type(self).__name__, item))
         return getattr(self, item)
 
-def get_license(package_name, version=None, safe=False):
+def get_package_data(package_name, version=None):
+    pypi_client = PyPI()
+    try:
+        return pypi_client.get_release_data(package_name, version=version)
+    except PackageNotFound:
+        pass
+    # try again, maybe the name is a little different
+    try:
+        package_name = pypi_client.find_pypi_name(package_name)
+        return pypi_client.get_release_data(package_name, version=version)
+    except PackageNotFound:
+        pass
+    # try again, maybe the specific version was deleted
+    try:
+        return pypi_client.get_release_data(package_name)
+    except PackageNotFound:
+        pass
+
+def get_license(package_name, version=None):
     license = License(
             name=package_name,
             version=version,
             )
-    pypi_client = PyPI()
-    try:
-        info = pypi_client.get_release_data(package_name, version=version)
-    except PackageNotFound:
-        if safe:
-            return license
-        raise
+    info = get_package_data(package_name, version)
     if not info:
         return license
     license.version = info.get('version', version)
@@ -62,7 +74,7 @@ def get_dependency_licenses(dependencies, progress_callback=None):
         version = _dependency_string_to_name_and_version(dependency_str)[1]
         if progress_callback:
             progress_callback(dependency, version, i, len(dependencies), True)
-        license = get_license(dependency, version=version, safe=True)
+        license = get_license(dependency, version=version)
         yield license
         if progress_callback:
             progress_callback(dependency, version, i, len(dependencies), False)
