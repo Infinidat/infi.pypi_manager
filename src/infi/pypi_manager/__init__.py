@@ -125,3 +125,15 @@ class PyPI(PyPIBase):
 
     def get_all_packages(self):
         return self._client.list_packages()
+
+    def find_pypi_name(self, package_name):
+        # find the "correct" name used by PyPI for a package,
+        # e.g. logbook -> Logbook, ipython-genutils -> ipython_genutils
+        import requests
+        requests.packages.urllib3.disable_warnings()
+        response = requests.get(self.server + "/pypi/" + package_name + "/", allow_redirects=False)
+        if response.status_code == 200:
+            return package_name
+        if response.status_code == 301:
+            return response.headers["Location"].split("/")[-1]
+        raise PackageNotFound(package_name)
