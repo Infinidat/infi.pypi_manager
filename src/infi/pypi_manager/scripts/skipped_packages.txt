@@ -27,3 +27,4 @@ schematics
 setuptools
 suds
 trollius
+greenlet
