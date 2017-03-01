@@ -5,7 +5,7 @@ cryptography
 Cython
 dapdict
 dataflake.cache
-django
+Django
 django-reversion
 djangopypi
 gevent
@@ -27,3 +27,4 @@ schematics
 setuptools
 suds
 trollius
+greenlet
