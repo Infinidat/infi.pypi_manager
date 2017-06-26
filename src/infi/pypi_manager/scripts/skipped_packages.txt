@@ -24,7 +24,6 @@ nose
 paramiko
 psutil
 pycrypto
-pylint
 python-cjson
 python-ldap
 pythonpy
