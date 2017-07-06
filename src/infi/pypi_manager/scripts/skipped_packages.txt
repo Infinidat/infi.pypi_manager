@@ -1,34 +1,37 @@
-bunch
-cffi
-comtypes
-cryptography
-Cython
-dapdict
-dataflake.cache
-Django
-django-reversion
-djangopypi
-gevent
-gipc
-gitflow
-greenlet
-IMAPClient
-ipython
-jenkinsapi
-Logbook
-lxml
-MarkupSafe
-mock
-mprpc
-nose
-paramiko
-psutil
-pycrypto
-python-cjson
-python-ldap
-pythonpy
-pyzmq
-schematics
-setuptools
-suds
-trollius
+bunch                   # breaks local code
+django-reversion        # breaks local code
+gevent                  # breaks local code
+gipc                    # breaks local code
+IMAPClient              # breaks local code
+mock                    # breaks local code
+paramiko                # breaks local code
+pyzmq                   # breaks local code
+schematics              # breaks local code
+cryptography            # breaks local code; requires bdist
+jenkinsapi              # latest version fails to install
+comtypes                # local modifications
+dataflake.cache         # local modifications
+djangopypi              # local modifications
+gitflow                 # local modifications
+nose                    # local modifications
+suds                    # local modifications
+psutil                  # local modifications; requires bdist
+pycrypto                # local modifications; requires bdist
+python-ldap             # local modifications; requires bdist
+iss                     # local package; global package is something else
+lunatic                 # local package; global package is something else
+stokado                 # local package; global package is something else
+Django                  # pinned to LTS
+ipython                 # pinned to version that supports Python 2.x
+pythonpy                # pinned to version that supports Python 2.x
+cffi                    # requires bdist
+Cython                  # requires bdist
+greenlet                # requires bdist
+Logbook                 # requires bdist
+lxml                    # requires bdist
+MarkupSafe              # requires bdist
+mprpc                   # requires bdist
+python-cjson            # requires bdist
+scandir                 # requires bdist
+trollius                # requires bdist
+setuptools              # requires update on local PyPI
