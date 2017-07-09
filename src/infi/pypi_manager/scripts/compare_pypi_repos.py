@@ -18,7 +18,7 @@ def get_versions_from_reference(reference_repo):
 
 def get_skipped_packages():
     with open(resource_filename(__name__, "skipped_packages.txt"), "rb") as fd:
-        return [line.strip() for line in fd.readlines()]
+        return [line.split("#")[0].strip() for line in fd.readlines()]
 
 def compare_pypi_repos(reference_repo, other_repo):
     upgrade_table = PrettyTable(["Package", reference_repo.server, other_repo.server])
