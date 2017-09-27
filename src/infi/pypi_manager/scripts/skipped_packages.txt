@@ -5,6 +5,8 @@ gipc                    # breaks local code
 IMAPClient              # breaks local code
 mock                    # breaks local code
 paramiko                # breaks local code
+pika                    # breaks local code
+PyOpenSSL               # breaks local code
 pyzmq                   # breaks local code
 schematics              # breaks local code
 cryptography            # breaks local code; requires bdist
@@ -18,6 +20,7 @@ suds                    # local modifications
 psutil                  # local modifications; requires bdist
 pycrypto                # local modifications; requires bdist
 python-ldap             # local modifications; requires bdist
+infinilint              # local package; global package is something else
 iss                     # local package; global package is something else
 lunatic                 # local package; global package is something else
 stokado                 # local package; global package is something else
