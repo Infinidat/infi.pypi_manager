@@ -1,5 +1,6 @@
 bunch                   # breaks local code
 django-reversion        # breaks local code
+djangorestframework     # pinned to Django 1.8.x
 gevent                  # breaks local code
 gipc                    # breaks local code
 IMAPClient              # breaks local code
