@@ -1,5 +1,6 @@
 bunch                   # breaks local code
 django-reversion        # breaks local code
+djangorestframework     # pinned to Django 1.8.x
 gevent                  # breaks local code
 gipc                    # breaks local code
 IMAPClient              # breaks local code
@@ -17,7 +18,6 @@ djangopypi              # local modifications
 gitflow                 # local modifications
 nose                    # local modifications
 suds                    # local modifications
-psutil                  # local modifications; requires bdist
 pycrypto                # local modifications; requires bdist
 python-ldap             # local modifications; requires bdist
 infinilint              # local package; global package is something else
@@ -27,6 +27,7 @@ stokado                 # local package; global package is something else
 Django                  # pinned to LTS
 ipython                 # pinned to version that supports Python 2.x
 pythonpy                # pinned to version that supports Python 2.x
+backports.lzma          # requires bdist
 cffi                    # requires bdist
 Cython                  # requires bdist
 greenlet                # requires bdist
@@ -34,6 +35,7 @@ Logbook                 # requires bdist
 lxml                    # requires bdist
 MarkupSafe              # requires bdist
 mprpc                   # requires bdist
+psutil                  # requires bdist
 python-cjson            # requires bdist
 scandir                 # requires bdist
 trollius                # requires bdist
