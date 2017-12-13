@@ -7,7 +7,7 @@ IMAPClient              # breaks local code
 mock                    # breaks local code
 paramiko                # breaks local code
 pika                    # breaks local code
-PyOpenSSL               # breaks local code
+pyOpenSSL               # breaks local code
 pyzmq                   # breaks local code
 schematics              # breaks local code
 cryptography            # breaks local code; requires bdist
@@ -40,3 +40,4 @@ python-cjson            # requires bdist
 scandir                 # requires bdist
 trollius                # requires bdist
 setuptools              # requires update on local PyPI
+arrow                   # fails to install due to dependencies
