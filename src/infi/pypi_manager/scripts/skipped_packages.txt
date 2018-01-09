@@ -1,19 +1,20 @@
 bunch                   # breaks local code
+cryptography            # breaks local code; requires bdist
+django-mailer           # breaks local code
 django-reversion        # breaks local code
 djangorestframework     # pinned to Django 1.8.x
 gevent                  # breaks local code
 gipc                    # breaks local code
 IMAPClient              # breaks local code
 mock                    # breaks local code
+msgpack-python          # breaks local code
 paramiko                # breaks local code
 pika                    # breaks local code
 pyOpenSSL               # breaks local code
 pyzmq                   # breaks local code
 schematics              # breaks local code
-cryptography            # breaks local code; requires bdist
 jenkinsapi              # latest version fails to install
 comtypes                # local modifications
-dataflake.cache         # local modifications
 djangopypi              # local modifications
 gitflow                 # local modifications
 nose                    # local modifications
