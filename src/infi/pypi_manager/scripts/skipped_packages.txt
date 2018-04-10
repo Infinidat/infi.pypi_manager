@@ -1,3 +1,4 @@
+arrow                   # fails to install due to dependencies
 bunch                   # breaks local code
 cryptography            # breaks local code; requires bdist
 django-mailer           # breaks local code
@@ -29,6 +30,7 @@ lunatic                 # local package; global package is something else
 stokado                 # local package; global package is something else
 ipython                 # pinned to version that supports Python 2.x
 pythonpy                # pinned to version that supports Python 2.x
+tornado                 # pinned to version that supports Python 2.7.8
 backports.lzma          # requires bdist
 cffi                    # requires bdist
 Cython                  # requires bdist
@@ -42,4 +44,3 @@ python-cjson            # requires bdist
 scandir                 # requires bdist
 trollius                # requires bdist
 setuptools              # requires update on local PyPI
-arrow                   # fails to install due to dependencies
