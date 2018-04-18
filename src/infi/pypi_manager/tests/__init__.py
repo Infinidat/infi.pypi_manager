@@ -23,7 +23,7 @@ class PyPI_TestCase(unittest.TestCase):
     def test_get_source_url__latest(self):
         pypi = PyPI()
         dist = pypi.get_latest_source_distribution_url('infi')
-        self.assertTrue(dist.startswith("https://pypi.python.org"))
+        self.assertTrue(dist.startswith("https://files.pythonhosted.org"))
         self.assertIn("infi-0.0.1.tar.gz", dist)
 
 class DjangoPyPI_TestCase(unittest.TestCase):
