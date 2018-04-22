@@ -1,33 +1,33 @@
 bunch                   # breaks local code
-django-reversion        # breaks local code
-djangorestframework     # pinned to Django 1.8.x
+cryptography            # breaks local code; requires bdist
+django-mailer           # breaks local code
+astroid                 # breaks local code
 gevent                  # breaks local code
 gipc                    # breaks local code
 IMAPClient              # breaks local code
 mock                    # breaks local code
+msgpack-python          # breaks local code
 paramiko                # breaks local code
 pika                    # breaks local code
+pylint                  # breaks local code
 pyOpenSSL               # breaks local code
 pyzmq                   # breaks local code
 schematics              # breaks local code
-cryptography            # breaks local code; requires bdist
 jenkinsapi              # latest version fails to install
 comtypes                # local modifications
-dataflake.cache         # local modifications
 djangopypi              # local modifications
 gitflow                 # local modifications
 nose                    # local modifications
 suds                    # local modifications
 pycrypto                # local modifications; requires bdist
 python-ldap             # local modifications; requires bdist
+backports.lzma          # local modifications; requires bdist
 infinilint              # local package; global package is something else
 iss                     # local package; global package is something else
 lunatic                 # local package; global package is something else
 stokado                 # local package; global package is something else
-Django                  # pinned to LTS
 ipython                 # pinned to version that supports Python 2.x
-pythonpy                # pinned to version that supports Python 2.x
-backports.lzma          # requires bdist
+tornado                 # pinned to version that supports Python 2.7.8
 cffi                    # requires bdist
 Cython                  # requires bdist
 greenlet                # requires bdist
@@ -40,4 +40,3 @@ python-cjson            # requires bdist
 scandir                 # requires bdist
 trollius                # requires bdist
 setuptools              # requires update on local PyPI
-arrow                   # fails to install due to dependencies
