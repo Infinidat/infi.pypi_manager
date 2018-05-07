@@ -46,4 +46,4 @@ class DjangoPyPI_TestCase(unittest.TestCase):
     def test_get_source_url__latest(self):
         pypi = DjangoPyPI("pypi.infinidat.com")
         self.assertEqual(pypi.get_latest_source_distribution_url('infi'),
-                         'http://pypi.infinidat.com//media/dists/infi-0.0.1.tar.gz#md5=62f7db8e3017d37b5a99cc571d5b0f07')
+                         'https://pypi.infinidat.com//media/dists/infi-0.0.1.tar.gz#md5=62f7db8e3017d37b5a99cc571d5b0f07')
