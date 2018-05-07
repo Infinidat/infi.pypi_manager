@@ -1,5 +1,6 @@
 __import__("pkg_resources").declare_namespace(__name__)
 
+import requests
 from logging import getLogger
 try:
     from xmlrpclib import ServerProxy
@@ -39,7 +40,6 @@ class DjangoPyPI(PyPIBase):
 
     def get_info_from_doap(self, package_name):
         """:returns a list of dictionaries of: has_sig, md5_digest, packagetype, url, version, filename"""
-        import requests
         import xml.etree.ElementTree as ElementTree
         doap = requests.get("{}/pypi/{}/doap.rdf".format(self.server, package_name)).content
         if b'Not Found' in doap:
@@ -129,7 +129,6 @@ class PyPI(PyPIBase):
     def find_pypi_name(self, package_name):
         # find the "correct" name used by PyPI for a package,
         # e.g. logbook -> Logbook, ipython-genutils -> ipython_genutils
-        import requests
         response = requests.get(self.server + "/pypi/" + package_name + "/", allow_redirects=False)
         if response.status_code == 200:
             return package_name

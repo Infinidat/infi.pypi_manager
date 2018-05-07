@@ -100,7 +100,7 @@ def send_setuptools_request(repository, username, password, data):
 def mirror_file(repository_config, filename, package_name, package_version, metadata):
     # merge the metadata with constant data that setuptools sends and data about the file.
     # then call the function that actually sends the post request.
-    f = open(filename,'rb')
+    f = open(filename, 'rb')
     content = f.read()
     f.close()
     basename = os.path.basename(filename)
