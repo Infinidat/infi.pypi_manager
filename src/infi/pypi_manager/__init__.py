@@ -30,7 +30,7 @@ class InvalidArchive(Exception):
 class PyPIBase(object):
     def __init__(self, server):
         if not server.startswith("http"):
-            server = "http://" + server
+            server = "https://" + server
         self.server = server
 
 
@@ -92,7 +92,7 @@ class DjangoPyPI(PyPIBase):
 
 
 class PyPI(PyPIBase):
-    def __init__(self, server="https://pypi.python.org"):
+    def __init__(self, server="https://pypi.org"):
         super(PyPI, self).__init__(server)
         self._client = ServerProxy("{}/pypi".format(self.server))
 
