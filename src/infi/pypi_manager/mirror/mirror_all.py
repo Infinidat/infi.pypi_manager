@@ -128,7 +128,11 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
 @contextmanager
 def temp_urlretrieve(url, localpath):
     logger.info("Retrieving {}".format(url))
-    urlretrieve(url, localpath)
+
+    req = requests.get(url)
+    with open(localpath, 'wb') as fd:
+        fd.write(req.content)
+
     try:
         yield
     finally:
