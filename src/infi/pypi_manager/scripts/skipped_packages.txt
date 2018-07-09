@@ -2,7 +2,7 @@ astroid                 # breaks local code
 bunch                   # breaks local code
 cryptography            # breaks local code; requires bdist
 django-mailer           # breaks local code
-Flask                   # breaks local code
+Fabric                  # breaks local code
 gevent                  # breaks local code
 gipc                    # breaks local code
 IMAPClient              # breaks local code
@@ -29,6 +29,7 @@ infinilint              # local package; global package is something else
 iss                     # local package; global package is something else
 lunatic                 # local package; global package is something else
 stokado                 # local package; global package is something else
+scotty                  # local package; global package is something else
 ipython                 # pinned to version that supports Python 2.x
 prompt_toolkit          # pinned to version that older ipython supports
 tornado                 # pinned to version that supports Python 2.7.8
