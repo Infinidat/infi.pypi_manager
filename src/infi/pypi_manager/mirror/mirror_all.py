@@ -127,6 +127,7 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
 
 @contextmanager
 def temp_urlretrieve(url, localpath):
+    import requests
     logger.info("Retrieving {}".format(url))
 
     req = requests.get(url)
