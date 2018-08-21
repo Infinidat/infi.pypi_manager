@@ -1,16 +1,15 @@
-astroid                 # breaks local code
 bunch                   # breaks local code
 cryptography            # breaks local code; requires bdist
 django-mailer           # breaks local code
 Fabric                  # breaks local code
 gevent                  # breaks local code
+greenlet                # breaks local code; requires bdist
 IMAPClient              # breaks local code
 mock                    # breaks local code
 msgpack-python          # breaks local code
 notebook                # breaks local code
 paramiko                # breaks local code
 pika                    # breaks local code
-pylint                  # breaks local code
 pyOpenSSL               # breaks local code
 pyzmq                   # breaks local code
 schematics              # breaks local code
@@ -33,7 +32,6 @@ prompt_toolkit          # pinned to version that older ipython supports
 tornado                 # pinned to version that supports Python 2.7.8
 cffi                    # requires bdist
 Cython                  # requires bdist
-greenlet                # requires bdist
 Logbook                 # requires bdist
 lxml                    # requires bdist
 MarkupSafe              # requires bdist
