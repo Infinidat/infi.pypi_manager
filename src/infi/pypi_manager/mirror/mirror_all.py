@@ -1,23 +1,10 @@
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
 import os
-import base64
-import socket
-try:
-    from httplib import HTTPConnection, HTTPSConnection
-    from urlparse import urlparse
-    from cStringIO import StringIO
-    from urllib import urlretrieve
-    string_types = (str, unicode)
-except ImportError:
-    # Python 3
-    from http.client import HTTPConnection, HTTPSConnection
-    from urllib.parse import urlparse
-    from io import StringIO
-    from urllib.request import urlretrieve
-    string_types = (str,)
+import io
+import hashlib
+from base64 import standard_b64encode
+
+from six.moves.urllib.request import urlopen, Request
+from six.moves.urllib.error import HTTPError
 
 from infi.pyutils.contexts import contextmanager
 from infi.pypi_manager import PyPI, DistributionNotFound
@@ -26,74 +13,65 @@ from logging import getLogger
 logger = getLogger()
 
 def send_setuptools_request(repository, username, password, data):
-    # code taken from distribute 0.6.35, file ./setuptools/command/upload.py
+    # code taken from distribute 40.9.0, file ./setuptools/command/upload.py
     # changed logging and return value
+    # TODO use code from twine?
 
     # set up the authentication
-    auth = "Basic " + base64.encodestring((username + ":" + password).encode("ascii")).strip().decode("ascii")
+    user_pass = (username + ":" + password).encode('ascii')
+    # The exact encoding of the authentication string is debated.
+    # Anyway PyPI only accepts ascii for both username or password.
+    auth = "Basic " + standard_b64encode(user_pass).decode('ascii')
 
     # Build up the MIME payload for the POST data
     boundary = '--------------GHSKFJDLGDS7543FJKLFHRE75642756743254'
-    sep_boundary = '\n--' + boundary
-    end_boundary = sep_boundary + '--'
-    body = StringIO()
+    sep_boundary = b'\r\n--' + boundary.encode('ascii')
+    end_boundary = sep_boundary + b'--\r\n'
+    body = io.BytesIO()
     for key, value in data.items():
+        title = '\r\nContent-Disposition: form-data; name="%s"' % key
         # handle multiple entries for the same name
-        if type(value) != type([]):
+        if not isinstance(value, list):
             value = [value]
         for value in value:
             if type(value) is tuple:
-                fn = ';filename="%s"' % value[0]
+                title += '; filename="%s"' % value[0]
                 value = value[1]
             else:
-                fn = ""
-            value = str(value)
+                value = str(value).encode('utf-8')
             body.write(sep_boundary)
-            body.write('\nContent-Disposition: form-data; name="%s"'%key)
-            body.write(fn)
-            body.write("\n\n")
+            body.write(title.encode('utf-8'))
+            body.write(b"\r\n\r\n")
             body.write(value)
-            if value and value[-1] == '\r':
-                body.write('\n')  # write an extra newline (lurve Macs)
     body.write(end_boundary)
-    body.write("\n")
     body = body.getvalue()
 
     logger.info("Submitting %s to %s" % (data['content'][0], repository))
 
     # build the Request
-    # We can't use urllib2 since we need to send the Basic
-    # auth right with the first request
-    schema, netloc, url, params, query, fragments = \
-        urlparse(repository)
-    assert not params and not query and not fragments
-    if schema == 'http':
-        http = HTTPConnection(netloc)
-    elif schema == 'https':
-        http = HTTPSConnection(netloc)
-    else:
-        raise AssertionError("unsupported schema "+schema)
-
-    data = ''
+    headers = {
+        'Content-type': 'multipart/form-data; boundary=%s' % boundary,
+        'Content-length': str(len(body)),
+        'Authorization': auth,
+    }
+    request = Request(repository, data=body,
+                      headers=headers)
+    # send the data
     try:
-        http.connect()
-        http.putrequest("POST", url)
-        http.putheader('Content-type',
-                       'multipart/form-data; boundary=%s'%boundary)
-        http.putheader('Content-length', str(len(body)))
-        http.putheader('Authorization', auth)
-        http.endheaders()
-        http.send(body)
-    except socket.error as e:
+        result = urlopen(request)
+        status = result.getcode()
+        reason = result.msg
+    except HTTPError as e:
+        status = e.code
+        reason = e.msg
+    except OSError as e:
         logger.exception("")
-        return
+        raise
 
-    r = http.getresponse()
-    if r.status == 200:
-        logger.info('Server response (%s): %s' % (r.status, r.reason))
+    if status == 200:
         return True
     else:
-        logger.error('Upload failed (%s): %s' % (r.status, r.reason))
+        logger.error('Upload failed (%s): %s' % (status, reason))
         return False
 
 
@@ -109,16 +87,12 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
         'protocol_version': '1',
         'metadata_version': '1.0',
         'content': (basename, content),
-        'md5_digest': md5(content).hexdigest(),
+        'md5_digest': hashlib.md5(content).hexdigest(),
         'name': package_name,
         'version': package_version,
     }
 
     data.update(metadata)
-
-    for key, value in list(data.items()):
-        if isinstance(value, string_types) and not isinstance(value, str):
-            data[key] = value.encode("utf-8")
 
     repository = repository_config["repository"]
     username = repository_config.get("username", "")
