@@ -1,35 +1,36 @@
 bunch                   # breaks local code
-cryptography            # breaks local code; requires bdist
-django-mailer           # breaks local code
 Fabric                  # breaks local code
-gevent                  # breaks local code
-greenlet                # breaks local code; requires bdist
 IMAPClient              # breaks local code
 mock                    # breaks local code
 msgpack-python          # breaks local code
 notebook                # breaks local code
-paramiko                # breaks local code
-pika                    # breaks local code
-pyOpenSSL               # breaks local code
 pyzmq                   # breaks local code
 schematics              # breaks local code
-jenkinsapi              # latest version fails to install
+tzlocal                 # breaks local code
 bitarray                # local modifications
 comtypes                # local modifications
 djangopypi              # local modifications
 gitflow                 # local modifications
 nose                    # local modifications
+pythonpy                # local modifications
 suds                    # local modifications
 pycrypto                # local modifications; requires bdist
 python-ldap             # local modifications; requires bdist
 backports.lzma          # local modifications; requires bdist
-infinilint              # local package; global package is something else
 iss                     # local package; global package is something else
 lunatic                 # local package; global package is something else
 stokado                 # local package; global package is something else
+forecaster              # local package; global package is something else
+CherryPy                # pinned to version that supports Python 2.x
 ipython                 # pinned to version that supports Python 2.x
+more-itertools          # pinned to version that supports Python 2.x
+Sphinx                  # pinned to version that supports Python 2.x
+django-cors-headers     # pinned to version that supports Python 2.x
 prompt_toolkit          # pinned to version that older ipython supports
+pgcli                   # pinned to version that older prompt_toolkit supports
 tornado                 # pinned to version that supports Python 2.7.8
+bcrypt                  # pinned to version that supports older setuptools
+pip                     # pinned to version that supports older setuptools
 cffi                    # requires bdist
 Cython                  # requires bdist
 Logbook                 # requires bdist
@@ -40,4 +41,4 @@ psutil                  # requires bdist
 python-cjson            # requires bdist
 scandir                 # requires bdist
 trollius                # requires bdist
-setuptools              # requires update on local PyPI
+setuptools              # problems on Solaris
