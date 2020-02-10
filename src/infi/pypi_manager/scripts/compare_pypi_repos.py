@@ -17,7 +17,7 @@ def get_versions_from_reference(reference_repo):
     return dict((k, unquote(v)) for k, v in search_result)
 
 def get_skipped_packages():
-    with open(resource_filename(__name__, "skipped_packages.txt"), "rb") as fd:
+    with open(resource_filename(__name__, "skipped_packages.txt"), "r") as fd:
         return [line.split("#")[0].strip() for line in fd.readlines()]
 
 def compare_pypi_repos(reference_repo, other_repo):
