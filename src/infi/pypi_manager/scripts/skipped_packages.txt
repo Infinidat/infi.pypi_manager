@@ -11,10 +11,10 @@ bitarray                # local modifications
 comtypes                # local modifications
 djangopypi              # local modifications
 gitflow                 # local modifications
+greenlet                # local modifications
 nose                    # local modifications
 pythonpy                # local modifications
 suds                    # local modifications
-backports.lzma          # local modifications; requires special bdist
 pycrypto                # local modifications; requires special bdist
 python-ldap             # local modifications; requires special bdist
 forecaster              # local package; global package is something else
@@ -22,4 +22,5 @@ iss                     # local package; global package is something else
 lunatic                 # local package; global package is something else
 stokado                 # local package; global package is something else
 setuptools              # pinned to version that supports Python 2.x
+backports.lzma          # requires special bdist
 cffi                    # requires special bdist
