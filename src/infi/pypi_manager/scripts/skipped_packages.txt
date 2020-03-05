@@ -10,7 +10,6 @@ bitarray                # local modifications
 comtypes                # local modifications
 djangopypi              # local modifications
 gitflow                 # local modifications
-greenlet                # local modifications
 nose                    # local modifications
 pythonpy                # local modifications
 suds                    # local modifications
