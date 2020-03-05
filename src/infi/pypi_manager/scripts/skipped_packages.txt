@@ -14,6 +14,8 @@ greenlet                # local modifications
 nose                    # local modifications
 pythonpy                # local modifications
 suds                    # local modifications
+gevent                  # local modifications; requires special bdist
+greenlet                # local modifications; requires special bdist
 pycrypto                # local modifications; requires special bdist
 python-ldap             # local modifications; requires special bdist
 forecaster              # local package; global package is something else
