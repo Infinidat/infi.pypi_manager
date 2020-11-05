@@ -1,3 +1,5 @@
+import time
+
 __import__("pkg_resources").declare_namespace(__name__)
 
 import requests
@@ -25,6 +27,12 @@ class UnsupportedArchive(Exception):
 
 class InvalidArchive(Exception):
     pass
+
+
+class RateLimitedServerProxy(ServerProxy):
+    def __getattr__(self, name):
+        time.sleep(1)
+        return super(RateLimitedServerProxy, self).__getattr__(name)
 
 
 class PyPIBase(object):
@@ -94,7 +102,7 @@ class DjangoPyPI(PyPIBase):
 class PyPI(PyPIBase):
     def __init__(self, server="https://pypi.org"):
         super(PyPI, self).__init__(server)
-        self._client = ServerProxy("{}/pypi".format(self.server))
+        self._client = RateLimitedServerProxy("{}/pypi".format(self.server))
 
     def get_available_versions(self, package_name):
         releases = self._client.package_releases(package_name)
