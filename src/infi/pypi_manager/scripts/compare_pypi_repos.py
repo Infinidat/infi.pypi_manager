@@ -17,11 +17,15 @@ def get_versions_from_reference(reference_repo):
     return dict((k, unquote(v)) for k, v in search_result)
 
 def get_skipped_packages():
-    with open(resource_filename(__name__, "skipped_packages.txt"), "rb") as fd:
+    with open(resource_filename(__name__, "skipped_packages.txt"), "r") as fd:
         return [line.split("#")[0].strip() for line in fd.readlines()]
 
+def get_major(version_string):
+    return int(version_string.split('.')[0])
+
 def compare_pypi_repos(reference_repo, other_repo):
-    upgrade_table = PrettyTable(["Package", reference_repo.server, other_repo.server])
+    upgrade_packages = []
+    upgrade_table = PrettyTable(["Package", reference_repo.server, other_repo.server, 'Major'])
     downgrade_table = PrettyTable(["Package", reference_repo.server, other_repo.server])
     skipped_table = PrettyTable(["Package", reference_repo.server, other_repo.server])
     skipped_packages = get_skipped_packages()
@@ -37,7 +41,9 @@ def compare_pypi_repos(reference_repo, other_repo):
             if name in skipped_packages or any(x in other_repo_version for x in ['a', 'b', 'dev', 'post', 'rc']):
                 skipped_table.add_row([name, reference_repo_version, other_repo_version])
             elif parse_version(reference_repo_version) < parse_version(other_repo_version):
-                upgrade_table.add_row([name, reference_repo_version, other_repo_version])
+                major_change = get_major(reference_repo_version) != get_major(other_repo_version)
+                upgrade_table.add_row([name, reference_repo_version, other_repo_version, 'Yes' if major_change else ''])
+                upgrade_packages.append((name, other_repo_version))
             else:
                 downgrade_table.add_row([name, reference_repo_version, other_repo_version])
 
@@ -49,6 +55,11 @@ def compare_pypi_repos(reference_repo, other_repo):
     print()
     print("Skipped Packages:")
     print(skipped_table)
+    print()
+    print("Upgrade commands:")
+    for name, version in upgrade_packages:
+        print("mirror_package %s %s" % (name, version))
+
 
 def main():
     import sys
