@@ -30,8 +30,20 @@ class InvalidArchive(Exception):
 
 class RateLimitedServerProxy(ServerProxy):
     def __getattr__(self, name):
-        time.sleep(1)
-        return super(RateLimitedServerProxy, self).__getattr__(name)
+        def wrapper(*args, **kwargs):
+            from os import getenv
+            from xmlrpc.client import Fault
+
+            delay = int(getenv("API_DELAY", 1))
+            time.sleep(delay)
+
+            try:
+                return super(RateLimitedServerProxy, self).__getattr__(name)(*args, **kwargs)
+            except Fault:
+                print("ERROR: command failed due to rate limiting."
+                      "Consider increasing the the default delay (environment variable \"API_DELAY\").")
+
+        return wrapper
 
 
 class PyPIBase(object):
