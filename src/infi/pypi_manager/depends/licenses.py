@@ -6,7 +6,7 @@ import re
 from .. import PyPI, PackageNotFound
 from . import get_dependencies
 
-_dependency_string_pattern = re.compile('^(?P<name>.*?)((==|<=|>=|=<|=>)(?P<version>.*))?$')
+_dependency_string_pattern = re.compile('^(?P<name>.*?)((==|<=|=<)(?P<version>.*))?$')
 def _dependency_string_to_name_and_version(s):
     match = _dependency_string_pattern.match(s)
     if not match:
@@ -36,15 +36,16 @@ def get_package_data(package_name, version=None):
         pass
     # try again, maybe the name is a little different
     try:
-        package_name = pypi_client.find_pypi_name(package_name)
-        return pypi_client.get_release_data(package_name, version=version)
+        pypi_name = pypi_client.find_pypi_name(package_name)
+        return pypi_client.get_release_data(pypi_name, version=version)
     except PackageNotFound:
         pass
     # try again, maybe the specific version was deleted
     try:
         return pypi_client.get_release_data(package_name)
-    except PackageNotFound:
-        pass
+    except PackageNotFound as exception:
+        return {'version': exception}
+
 
 def get_license(package_name, version=None):
     license = License(
@@ -63,6 +64,9 @@ def get_license(package_name, version=None):
     if 'license' in info:
         license.notice = info['license']
         license.license = license.license or license.notice
+
+        license.notice = license.notice.split("\n")[0]
+        license.license = license.license.split("\n")[0]
     license.homepage = info.get('home_page')
     license.package_url = info.get('release_url')
     return license
