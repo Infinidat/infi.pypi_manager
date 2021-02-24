@@ -107,7 +107,7 @@ class PyPI(PyPIBase):
         releases = self._client.package_releases(package_name)
         logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
         if len(releases) == 0:
-            raise PackageNotFound(package_name)
+            raise PackageNotFound("{0} was not found in {1}".format(package_name, self.server))
         return releases
 
     def get_latest_version(self, package_name):
