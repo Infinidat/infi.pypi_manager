@@ -31,17 +31,22 @@ class InvalidArchive(Exception):
 class RateLimitedServerProxy(ServerProxy):
     def __getattr__(self, name):
         def wrapper(*args, **kwargs):
-            from os import getenv
-            from xmlrpc.client import Fault
+            from os import environ
+            import xmlrpc
 
-            delay = int(getenv("API_DELAY", 1))
+            try:
+                delay = int(environ.get("API_DELAY"))
+            except (ValueError, TypeError):
+                delay = 1
+
             time.sleep(delay)
 
             try:
                 return super(RateLimitedServerProxy, self).__getattr__(name)(*args, **kwargs)
-            except Fault:
-                print("ERROR: command failed due to rate limiting."
-                      "Consider increasing the the default delay (environment variable \"API_DELAY\").")
+            except xmlrpc.client.Fault:
+                print('\nERROR: command failed due to rate limiting.\n'
+                      'Consider increasing the the default delay (environment variable "API_DELAY").')
+                quit()
 
         return wrapper
 
