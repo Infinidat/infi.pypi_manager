@@ -46,7 +46,7 @@ class RateLimitedServerProxy(ServerProxy):
             except xmlrpc.client.Fault:
                 print('\nERROR: command failed due to rate limiting.\n'
                       'Consider increasing the the default delay (environment variable "API_DELAY").')
-                raise SystemExit
+                raise SystemExit(1)
 
         return wrapper
 
