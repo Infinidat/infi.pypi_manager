@@ -7,7 +7,7 @@ from six.moves.urllib.request import urlopen, Request
 from six.moves.urllib.error import HTTPError
 
 from infi.pyutils.contexts import contextmanager
-from infi.pypi_manager import PyPI, DistributionNotFound
+from infi.pypi_manager import PyPI, DistributionNotFound, rate_limit
 
 from logging import getLogger
 logger = getLogger()
@@ -138,6 +138,7 @@ def get_repository_config(server_name):
     pypirc.repository = server_name
     return pypirc._read_pypirc()
 
+@rate_limit
 def mirror_package(server_name, package_name, version=None):
     pypi = PyPI()
     version = version or pypi.get_latest_version(package_name)

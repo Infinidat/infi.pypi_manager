@@ -12,6 +12,26 @@ except ImportError:
 logger = getLogger()
 
 
+def rate_limit(func):
+    from functools import wraps
+    @wraps(func)
+    def inner(*args, **kwargs):
+        from os import environ
+        import xmlrpc
+
+        delay = int(environ.get("API_DELAY", 1))
+        time.sleep(delay)
+
+        try:
+            return func(*args, **kwargs)
+        except xmlrpc.client.Fault:
+            print('\nERROR: command failed due to rate limiting.\n'
+                  'Consider increasing the the default delay (environment variable "API_DELAY").')
+            raise SystemExit(1)
+
+    return inner
+
+
 class PackageNotFound(Exception):
     pass
 
@@ -26,29 +46,6 @@ class UnsupportedArchive(Exception):
 
 class InvalidArchive(Exception):
     pass
-
-
-class RateLimitedServerProxy(ServerProxy):
-    def __getattr__(self, name):
-        def wrapper(*args, **kwargs):
-            from os import environ
-            import xmlrpc
-
-            try:
-                delay = int(environ.get("API_DELAY"))
-            except (ValueError, TypeError):
-                delay = 1
-
-            time.sleep(delay)
-
-            try:
-                return super(RateLimitedServerProxy, self).__getattr__(name)(*args, **kwargs)
-            except xmlrpc.client.Fault:
-                print('\nERROR: command failed due to rate limiting.\n'
-                      'Consider increasing the the default delay (environment variable "API_DELAY").')
-                raise SystemExit(1)
-
-        return wrapper
 
 
 class PyPIBase(object):
@@ -118,8 +115,9 @@ class DjangoPyPI(PyPIBase):
 class PyPI(PyPIBase):
     def __init__(self, server="https://pypi.org"):
         super(PyPI, self).__init__(server)
-        self._client = RateLimitedServerProxy("{}/pypi".format(self.server))
+        self._client = ServerProxy("{}/pypi".format(self.server))
 
+    @rate_limit
     def get_available_versions(self, package_name):
         releases = self._client.package_releases(package_name)
         logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
@@ -130,6 +128,7 @@ class PyPI(PyPIBase):
     def get_latest_version(self, package_name):
         return self.get_available_versions(package_name)[0]
 
+    @rate_limit
     def get_releases_for_version(self, package_name, release_version):
         return self._client.release_urls(package_name, release_version)
 
@@ -142,11 +141,13 @@ class PyPI(PyPIBase):
             return release['url']
         raise SourceDistributionNotFound(package_name, release_version)
 
+    @rate_limit
     def get_release_data(self, package_name, version=None):
         if version is None:
             version = self.get_latest_version(package_name)
         return self._client.release_data(package_name, version)
 
+    @rate_limit
     def get_all_packages(self):
         return self._client.list_packages()
 
