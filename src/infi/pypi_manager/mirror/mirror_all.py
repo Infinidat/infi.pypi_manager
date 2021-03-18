@@ -138,12 +138,11 @@ def get_repository_config(server_name):
     pypirc.repository = server_name
     return pypirc._read_pypirc()
 
-@catch_rate_limit
 def mirror_package(server_name, package_name, version=None):
     pypi = PyPI()
     version = version or pypi.get_latest_version(package_name)
     version_data = pypi.get_release_data(package_name, version)
-    release_dataset = pypi._client.release_urls(package_name, version)
+    release_dataset = pypi.get_releases_for_version(package_name, version)
     repository_config = get_repository_config(server_name)
     final_result = True
 
