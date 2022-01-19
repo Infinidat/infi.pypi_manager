@@ -51,7 +51,7 @@ def _mirror_package(arguments):
         if release_version == "all":
             from infi.pypi_manager import PyPI
             pypi = PyPI()
-            for release_version in pypi.get_available_versions():
+            for release_version in pypi.get_available_versions(package_name):
                 mirror_package(index_server, package_name, release_version)
         else:
             mirror_package(index_server, package_name, release_version)

@@ -126,15 +126,18 @@ class PyPI(PyPIBase):
         self._client = RateLimitedServerProxy("{}/pypi".format(self.server))
 
     @warp_rate_limited_operation
-    def get_available_versions(self, package_name):
-        releases = self._client.package_releases(package_name)
+    def _get_package_releases(self, package_name, show_hidden=False):
+        releases = self._client.package_releases(package_name, show_hidden=show_hidden)
         logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
         if len(releases) == 0:
             raise PackageNotFound("{0} was not found in {1}".format(package_name, self.server))
         return releases
 
+    def get_available_versions(self, package_name):
+        return self._get_package_releases(package_name, show_hidden=True)
+
     def get_latest_version(self, package_name):
-        return self.get_available_versions(package_name)[0]
+        return self._get_package_releases(package_name, show_hidden=False)[0]
 
     @warp_rate_limited_operation
     def get_releases_for_version(self, package_name, release_version):
