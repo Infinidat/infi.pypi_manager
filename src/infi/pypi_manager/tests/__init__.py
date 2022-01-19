@@ -9,6 +9,11 @@ class PyPI_TestCase(unittest.TestCase):
         result = pypi.get_available_versions('infi.traceback')
         assert len(result) > 1
 
+    def test_get_latest_version(self):
+        pypi = PyPI()
+        result = pypi.get_latest_version('infi.traceback')
+        assert isinstance(result, str)
+
     def test_get_package__doesn_not_exist(self):
         pypi = PyPI()
         with self.assertRaises(PackageNotFound):
