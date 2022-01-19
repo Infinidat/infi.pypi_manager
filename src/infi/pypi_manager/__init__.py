@@ -127,7 +127,7 @@ class PyPI(PyPIBase):
 
     @warp_rate_limited_operation
     def _get_package_releases(self, package_name, show_hidden=False):
-        releases = self._client.package_releases(package_name, show_hidden=show_hidden)
+        releases = self._client.package_releases(package_name, show_hidden)
         logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
         if len(releases) == 0:
             raise PackageNotFound("{0} was not found in {1}".format(package_name, self.server))
