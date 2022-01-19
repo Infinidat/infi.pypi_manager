@@ -44,11 +44,17 @@ def _mirror_package(arguments):
         # and uses setup.py to build a specific distribution and upload then upload it
         mirror_package(package_name, distribution_type, release_version, index_server, use_download_url)
     else:
-        from .mirror_all import mirror_package
         # mirror_all.mirror_package downloads all the release files on the
         # remote server and posts them with their associated data
         # to the local server, "faking" the setuptools requests for each
-        mirror_package(index_server, package_name, release_version)
+        from .mirror_all import mirror_package
+        if release_version == "all":
+            from infi.pypi_manager import PyPI
+            pypi = PyPI()
+            for release_version in pypi.get_available_versions():
+                mirror_package(index_server, package_name, release_version)
+        else:
+            mirror_package(index_server, package_name, release_version)
     if recursive:
         _recursive(package_name, release_version, arguments)
 
