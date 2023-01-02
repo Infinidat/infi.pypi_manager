@@ -12,6 +12,23 @@ except ImportError:
 logger = getLogger()
 
 
+def warp_rate_limited_operation(func):
+    """HOSTDEV-3337: wrap the API rate limit exception and notify user"""
+    from infi.pyutils.decorators import wraps
+    @wraps(func)
+    def inner(*args, **kwargs):
+        import xmlrpc
+
+        try:
+            return func(*args, **kwargs)
+        except xmlrpc.client.Fault:
+            print('\nERROR: command failed due to rate limiting.\n'
+                  'Consider increasing the the default delay (environment variable "API_DELAY").')
+            raise SystemExit(1)
+
+    return inner
+
+
 class PackageNotFound(Exception):
     pass
 
@@ -30,8 +47,13 @@ class InvalidArchive(Exception):
 
 class RateLimitedServerProxy(ServerProxy):
     def __getattr__(self, name):
-        time.sleep(1)
+        from os import environ
+
+        delay = int(environ.get("API_DELAY", 1))
+        time.sleep(delay)
+
         return super(RateLimitedServerProxy, self).__getattr__(name)
+
 
 
 class PyPIBase(object):
@@ -103,16 +125,21 @@ class PyPI(PyPIBase):
         super(PyPI, self).__init__(server)
         self._client = RateLimitedServerProxy("{}/pypi".format(self.server))
 
-    def get_available_versions(self, package_name):
-        releases = self._client.package_releases(package_name)
+    @warp_rate_limited_operation
+    def _get_package_releases(self, package_name, show_hidden=False):
+        releases = self._client.package_releases(package_name, show_hidden)
         logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
         if len(releases) == 0:
-            raise PackageNotFound(package_name)
+            raise PackageNotFound("{0} was not found in {1}".format(package_name, self.server))
         return releases
 
-    def get_latest_version(self, package_name):
-        return self.get_available_versions(package_name)[0]
+    def get_available_versions(self, package_name):
+        return self._get_package_releases(package_name, show_hidden=True)
 
+    def get_latest_version(self, package_name):
+        return self._get_package_releases(package_name, show_hidden=False)[0]
+
+    @warp_rate_limited_operation
     def get_releases_for_version(self, package_name, release_version):
         return self._client.release_urls(package_name, release_version)
 
@@ -125,11 +152,13 @@ class PyPI(PyPIBase):
             return release['url']
         raise SourceDistributionNotFound(package_name, release_version)
 
+    @warp_rate_limited_operation
     def get_release_data(self, package_name, version=None):
         if version is None:
             version = self.get_latest_version(package_name)
         return self._client.release_data(package_name, version)
 
+    @warp_rate_limited_operation
     def get_all_packages(self):
         return self._client.list_packages()
 
