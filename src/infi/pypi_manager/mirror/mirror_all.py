@@ -145,6 +145,7 @@ def mirror_package(server_name, package_name, version=None, pypi=None):
     version_data = pypi.get_release_data(package_name, version)
     release_dataset = pypi.get_releases_for_version(package_name, version)
     repository_config = get_repository_config(server_name)
+    assert repository_config, "No repository config found for '{}'".format(server_name)
     final_result = True
 
     if not release_dataset:
@@ -152,7 +153,11 @@ def mirror_package(server_name, package_name, version=None, pypi=None):
         raise DistributionNotFound(msg.format(package_name, version))
 
     for release_data in release_dataset:
-        result = mirror_release(repository_config, package_name, version, version_data, release_data)
+        try:
+            result = mirror_release(repository_config, package_name, version, version_data, release_data)
+        except Exception:
+            logger.exception("Failed to upload {}".format(release_data))
+            result = False
         final_result = final_result and result
 
     return final_result
