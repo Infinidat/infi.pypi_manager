@@ -1,0 +1,12 @@
+stages:
+  - test
+
+test:
+  image: python:3.9
+  stage: test
+  script:
+    - python3 -m venv venv
+    - venv/bin/python3 -m pip install infi.projector -i https://pypi.infinidat.com/simple
+    - venv/bin/projector devenv build
+    - venv/bin/pip install -e .
+    - bin/nosetests -v --with-infi-traceback
