@@ -36,6 +36,15 @@ def parse_version(version_string):
 
 
 def parse_constraint(constraint):
+    """
+    Parse a version constraint (e.g ">=3.7.0") into a function
+    that will take a version as input (e.g "3.8.0") and return True if it satisfies the constraint
+    >>> constraint_checker = parse_constraint(">=3.7.0")
+    >>> constraint_checker("3.8.0")
+    True
+    >>> constraint_checker("3.6.0")
+    False
+    """
     import re
     pattern = r"(?P<g_or_l>\>|\<)(?P<equal>=?)(?P<version>.+)"
     match = re.match(pattern, constraint)
@@ -78,7 +87,7 @@ def _mirror_package(arguments):
             pypi = PyPI()
             for release_version in pypi.get_available_versions(package_name):
                 mirror_package(index_server, package_name, release_version)
-        if release_version.startswith(">") or release_version.startswith("<"):
+        elif release_version is not None and release_version.startswith(">") or release_version.startswith("<"):
             from infi.pypi_manager import PyPI
             pypi = PyPI()
             checker = parse_constraint(release_version)

@@ -85,7 +85,7 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
     data = {
         ':action': 'file_upload',
         'protocol_version': '1',
-        'metadata_version': '1.0',
+        'metadata_version': '2.1',
         'content': (basename, content),
         'md5_digest': hashlib.md5(content).hexdigest(),
         'name': package_name,
