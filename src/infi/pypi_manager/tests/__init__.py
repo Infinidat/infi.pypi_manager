@@ -1,4 +1,5 @@
 import unittest
+import uuid
 
 from .. import PyPI, PackageNotFound
 from ..mirror.mirror_build import download_package_from_global_pypi, DjangoPyPI
@@ -17,7 +18,7 @@ class PyPI_TestCase(unittest.TestCase):
     def test_get_package__doesn_not_exist(self):
         pypi = PyPI()
         with self.assertRaises(PackageNotFound):
-            pypi.get_available_versions('abcxyz')
+            pypi.get_available_versions(uuid.uuid4().hex)
 
     def test_download(self):
         import stat
@@ -40,7 +41,7 @@ class DjangoPyPI_TestCase(unittest.TestCase):
     def test_get_package__doesn_not_exist(self):
         pypi = DjangoPyPI("pypi.infinidat.com")
         with self.assertRaises(PackageNotFound):
-            pypi.get_available_versions('abcxyz')
+            pypi.get_available_versions(uuid.uuid4().hex)
 
     def test_download(self):
         import stat
