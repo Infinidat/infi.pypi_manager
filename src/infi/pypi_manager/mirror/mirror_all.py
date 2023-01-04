@@ -123,8 +123,9 @@ def mirror_release(repository_config, package_name, version, version_data, relea
         'pyversion': '' if release_data['python_version'] == 'source' else release_data['python_version'],
         'comment': release_data['comment_text'],
     }
-    for key in ['license', 'author', 'author_email', 'home_page', 'platform', 'summary', 'classifiers', 'description']:
-        metadata[key] = version_data[key]
+    for key in ['license', 'author', 'author_email', 'home_page', 'platform', 'summary', 'classifiers', 'description', 'requires_python']:
+        if key in version_data:
+            metadata[key] = version_data[key]
 
     with temp_urlretrieve(release_data['url'], release_data['filename']):
         return mirror_file(repository_config, release_data['filename'], package_name, version, metadata)
