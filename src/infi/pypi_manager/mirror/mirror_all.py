@@ -85,7 +85,7 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
     data = {
         ':action': 'file_upload',
         'protocol_version': '1',
-        'metadata_version': '1.0',
+        'metadata_version': '2.1',
         'content': (basename, content),
         'md5_digest': hashlib.md5(content).hexdigest(),
         'name': package_name,
@@ -123,9 +123,19 @@ def mirror_release(repository_config, package_name, version, version_data, relea
         'pyversion': '' if release_data['python_version'] == 'source' else release_data['python_version'],
         'comment': release_data['comment_text'],
     }
-    for key in ['license', 'author', 'author_email', 'home_page', 'platform', 'summary', 'classifiers', 'description']:
-        metadata[key] = version_data[key]
-
+    metadata_keys = ('platform','supported_platform','summary','description',
+                'keywords','home_page','download_url','author','author_email',
+                'maintainer','maintainer_email','license','classifier', 'classifiers',
+                'requires_dist','provides_dist','obsoletes_dist',
+                'requires_python','requires_external','project_urls',
+                'provides_extras', 'description_content_type')
+    for key in metadata_keys:
+        if key in version_data:
+            metadata[key] = version_data[key]
+    if "classifier" in metadata:
+        metadata["classifiers"] = metadata["classifier"]
+    if "classifiers" in metadata:
+        metadata["classifier"] = metadata["classifiers"]
     with temp_urlretrieve(release_data['url'], release_data['filename']):
         return mirror_file(repository_config, release_data['filename'], package_name, version, metadata)
 
@@ -145,6 +155,7 @@ def mirror_package(server_name, package_name, version=None, pypi=None):
     version_data = pypi.get_release_data(package_name, version)
     release_dataset = pypi.get_releases_for_version(package_name, version)
     repository_config = get_repository_config(server_name)
+    assert repository_config, "No repository config found for '{}'".format(server_name)
     final_result = True
 
     if not release_dataset:
@@ -152,7 +163,11 @@ def mirror_package(server_name, package_name, version=None, pypi=None):
         raise DistributionNotFound(msg.format(package_name, version))
 
     for release_data in release_dataset:
-        result = mirror_release(repository_config, package_name, version, version_data, release_data)
+        try:
+            result = mirror_release(repository_config, package_name, version, version_data, release_data)
+        except Exception:
+            logger.exception("Failed to upload {}".format(release_data))
+            result = False
         final_result = final_result and result
 
     return final_result
