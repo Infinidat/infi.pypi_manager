@@ -31,40 +31,6 @@ def _logging():
     basicConfig(stream=sys.stdout, level=DEBUG)
 
 
-def parse_version(version_string):
-    return tuple(map(int, version_string.split(".")))
-
-
-def parse_constraint(constraint):
-    """
-    Parse a version constraint (e.g ">=3.7.0") into a function
-    that will take a version as input (e.g "3.8.0") and return True if it satisfies the constraint
-    >>> constraint_checker = parse_constraint(">=3.7.0")
-    >>> constraint_checker("3.8.0")
-    True
-    >>> constraint_checker("3.6.0")
-    False
-    """
-    import re
-    pattern = r"(?P<g_or_l>\>|\<)(?P<equal>=?)(?P<version>.+)"
-    match = re.match(pattern, constraint)
-    if not match:
-        raise ValueError("Constraint {} in unknown format".format(constraint))
-    groups = match.groupdict()
-    version = parse_version(groups["version"])
-    if groups["g_or_l"] == ">":
-        if groups["equal"]:
-            operator = lambda x: parse_version(x) >= version
-        else:
-            operator = lambda x: parse_version(x) > version
-    else:
-        if groups["equal"]:
-            operator = lambda x: parse_version(x) <= version
-        else:
-            operator = lambda x: parse_version(x) < version
-    return operator
-
-
 def _mirror_package(arguments):
     index_server = arguments.get("--index-server")
     package_name = arguments.get("<package_name>")
@@ -86,13 +52,6 @@ def _mirror_package(arguments):
             from infi.pypi_manager import PyPI
             pypi = PyPI()
             for release_version in pypi.get_available_versions(package_name):
-                mirror_package(index_server, package_name, release_version)
-        elif release_version is not None and release_version.startswith(">") or release_version.startswith("<"):
-            from infi.pypi_manager import PyPI
-            pypi = PyPI()
-            checker = parse_constraint(release_version)
-            matching_versions = [release_version for release_version in pypi.get_available_versions(package_name) if checker(release_version)]
-            for release_version in matching_versions:
                 mirror_package(index_server, package_name, release_version)
         else:
             mirror_package(index_server, package_name, release_version)
