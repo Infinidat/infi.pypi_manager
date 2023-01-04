@@ -85,7 +85,7 @@ def mirror_file(repository_config, filename, package_name, package_version, meta
     data = {
         ':action': 'file_upload',
         'protocol_version': '1',
-        'metadata_version': '1.0',
+        'metadata_version': '2.1',
         'content': (basename, content),
         'md5_digest': hashlib.md5(content).hexdigest(),
         'name': package_name,
@@ -123,8 +123,15 @@ def mirror_release(repository_config, package_name, version, version_data, relea
         'pyversion': '' if release_data['python_version'] == 'source' else release_data['python_version'],
         'comment': release_data['comment_text'],
     }
-    for key in ['license', 'author', 'author_email', 'home_page', 'platform', 'summary', 'classifiers', 'description']:
-        metadata[key] = version_data[key]
+    metadata_keys = ('platform','supported_platform','summary','description',
+                'keywords','home_page','download_url','author','author_email',
+                'maintainer','maintainer_email','license','classifier', 'classifiers'
+                'requires_dist','provides_dist','obsoletes_dist',
+                'requires_python','requires_external','project_urls',
+                'provides_extras', 'description_content_type')
+    for key in metadata_keys:
+        if key in version_data:
+            metadata[key] = version_data[key]
 
     with temp_urlretrieve(release_data['url'], release_data['filename']):
         return mirror_file(repository_config, release_data['filename'], package_name, version, metadata)
