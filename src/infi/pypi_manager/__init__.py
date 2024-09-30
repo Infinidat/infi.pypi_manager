@@ -53,12 +53,16 @@ class JsonClient():
     def _package_release(self, package_name, version):
         # GET /pypi/package_name/release_version/json
         r = requests.get(f"{self._server}/{package_name}/{version}/json")
+        if r.status_code == 404:
+            raise PackageNotFound
         r.raise_for_status()
         return r.json()
 
     def package_releases(self, package_name, show_hidden):
         # GET /pypi/package_name/json
         r = requests.get(f"{self._server}/{package_name}/json")
+        if r.status_code == 404:
+            raise PackageNotFound
         r.raise_for_status()
         return r.json()['releases']
 
@@ -153,7 +157,8 @@ class PyPI(PyPIBase):
 
     @warp_rate_limited_operation
     def _get_package_releases(self, package_name, show_hidden=False):
-        releases = self._client.package_releases(package_name, show_hidden)
+        releases = self._client.package_releases(package_name, show_hidden).keys()
+        releases = list(releases)
         logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
         if len(releases) == 0:
             raise PackageNotFound("{0} was not found in {1}".format(package_name, self.server))
