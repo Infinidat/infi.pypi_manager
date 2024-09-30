@@ -13,6 +13,7 @@
 # eclipse
 .project
 .pydevproject
+.venv
 
 # setuptools
 bin/
