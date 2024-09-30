@@ -21,7 +21,8 @@ def warp_rate_limited_operation(func):
 
         try:
             return func(*args, **kwargs)
-        except xmlrpc.client.Fault:
+        except xmlrpc.client.Fault as e:
+            logger.exception(e)
             print('\nERROR: command failed due to rate limiting.\n'
                   'Consider increasing the the default delay (environment variable "API_DELAY").')
             raise SystemExit(1)
@@ -45,7 +46,37 @@ class InvalidArchive(Exception):
     pass
 
 
-class RateLimitedServerProxy(ServerProxy):
+class JsonClient():
+    def __init__(self, server):
+        self._server = server
+
+    def _package_release(self, package_name, version):
+        # GET /pypi/package_name/release_version/json
+        r = requests.get(f"{self._server}/{package_name}/{version}/json")
+        if r.status_code == 404:
+            raise PackageNotFound
+        r.raise_for_status()
+        return r.json()
+
+    def package_releases(self, package_name, show_hidden):
+        # GET /pypi/package_name/json
+        r = requests.get(f"{self._server}/{package_name}/json")
+        if r.status_code == 404:
+            raise PackageNotFound
+        r.raise_for_status()
+        return r.json()['releases']
+
+    def release_urls(self, package_name, release_version):
+        return self._package_release(package_name, release_version)['urls']
+
+    def release_data(self, package_name, version):
+        return self._package_release(package_name, version)['info']
+
+    def list_packages(self):
+        raise NotImplemented
+
+
+class RateLimitedServerProxy(JsonClient):
     def __getattr__(self, name):
         from os import environ
 
@@ -53,7 +84,6 @@ class RateLimitedServerProxy(ServerProxy):
         time.sleep(delay)
 
         return super(RateLimitedServerProxy, self).__getattr__(name)
-
 
 
 class PyPIBase(object):
@@ -127,7 +157,8 @@ class PyPI(PyPIBase):
 
     @warp_rate_limited_operation
     def _get_package_releases(self, package_name, show_hidden=False):
-        releases = self._client.package_releases(package_name, show_hidden)
+        releases = self._client.package_releases(package_name, show_hidden).keys()
+        releases = list(releases)
         logger.info("Versions found for {!r}: {!r}".format(package_name, releases))
         if len(releases) == 0:
             raise PackageNotFound("{0} was not found in {1}".format(package_name, self.server))
